@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Miro\\source\\repos\\MyFirstCompilerv01\\MyFirstCompiler\\MyFirstCompiler.csproj",
+      "projectUniqueName": "C:\\Users\\Miro\\source\\repos\\MyFirstCompiler\\MyFirstCompiler\\MyFirstCompiler.csproj",
       "projectName": "MyFirstCompiler",
-      "projectPath": "C:\\Users\\Miro\\source\\repos\\MyFirstCompilerv01\\MyFirstCompiler\\MyFirstCompiler.csproj",
+      "projectPath": "C:\\Users\\Miro\\source\\repos\\MyFirstCompiler\\MyFirstCompiler\\MyFirstCompiler.csproj",
       "packagesPath": "C:\\Users\\Miro\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Miro\\source\\repos\\MyFirstCompilerv01\\MyFirstCompiler\\obj\\",
+      "outputPath": "C:\\Users\\Miro\\source\\repos\\MyFirstCompiler\\MyFirstCompiler\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

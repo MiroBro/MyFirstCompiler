@@ -3,7 +3,6 @@ C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\Debug\net7.0\MyFi
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\Debug\net7.0\MyFirstCompiler.runtimeconfig.json
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\Debug\net7.0\MyFirstCompiler.dll
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\Debug\net7.0\MyFirstCompiler.pdb
-C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\Debug\net7.0\MyFirstCompiler.csproj.AssemblyReference.cache
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\Debug\net7.0\MyFirstCompiler.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\Debug\net7.0\MyFirstCompiler.AssemblyInfoInputs.cache
 C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\Debug\net7.0\MyFirstCompiler.AssemblyInfo.cs

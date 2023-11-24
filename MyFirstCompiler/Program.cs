@@ -12,8 +12,8 @@ class Program
             Console.WriteLine("Here we go compiling!");
             Console.ForegroundColor = ConsoleColor.White;
 
-            var ast = new Compiler();
-            ast.Run(args[0]);
+            var compiler = new Compiler();
+            compiler.Run(args[0]);
         }
         else 
         {
@@ -21,8 +21,5 @@ class Program
             Console.WriteLine("Where's the argument? You have to have at least one expression for me to compile!");
             Console.ForegroundColor = ConsoleColor.White;
         }
-
-
     }
-
 }

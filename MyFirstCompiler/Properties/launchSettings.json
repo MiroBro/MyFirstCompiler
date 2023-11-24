@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MyFirstCompiler": {
+      "commandName": "Project",
+      "commandLineArgs": "\"40 + 2\""
+    }
+  }
+}

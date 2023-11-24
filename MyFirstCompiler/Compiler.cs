@@ -9,36 +9,99 @@ using System.Reflection.PortableExecutable;
 
 internal class Compiler
 {
+    //This assembly works for NASM on Windows x64 bit
     private string assemblyBoilerPlateStart = """
-                        ; program 3.1
-            ; sample Assembly program - MASM (64-bit)
+                global WinMain
+                extern  GetStdHandle
+                extern  WriteFile
+                extern  ExitProcess
 
-            extern ExitProcess:PROC
-            public mainCRTStartup
+                section .text
 
-            .data
-            ;sum DWORD 0
-
-            .code
-            mainCRTStartup PROC       ; Use mainCRTStartup if making a CONSOLE app without
-                                      ;   any C/C++ files AND if you haven't overridden the
-                                      ;   ENTRY point in the Visual Studio Project.
-
-              sub rsp, 8+32           ; Align stack on 16 byte boundary and allocate 32 bytes
-                                      ;   of shadow space for call to ExitProcess. Shadow space
-                                      ;   is required for 64-bit Windows Calling Convention as
-                                      ;   is ensuring the stack is aligned on a 16 byte boundary
-                                      ;   at the point of making a call to a C library function
-                                      ;   or doing a WinAPI call.
+                ;On Wndows 64bit ABI (application binary interface) the first four parameters are passed in rcx,rdx,r8,r9 in that order. 
+                ;The return from a functions is returned to rax
+                ;In addition we are required to reserve space for shadow stack. It's custom to reserve 32 bytes in the shadow stack
+            WinMain:
+                sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
             """;
 
     private string assemblyBoilerPlateEnd = """
-              call ExitProcess
-            mainCRTStartup ENDP
-            END
+                ;¨CALCULATIONS HERE
+                ;¨CHANGE THIS
+                ;¨Take the number in rcx, write out what it looks like as a string, make it so it can take ANY number
+                ;¨I should not google the answer, no copy paste, sit and it doesnt work
+                ;¨
+
+                mov    byte[message], 0x34 ;move a 4 (written in hex) inte the first byte in message
+                mov    byte[message +1], 0x32 ;move a 2 into the second byte in message
+
+                lea    rcx, message+2 ;lea loaded in the adress of message byte place 3
+                mov    rdx, 4 ;save the remaining amount of space in the message to loop through
+
+            loop:
+                mov    byte[rcx], 0x20
+                inc    rcx
+                dec    rdx
+                jnz    loop
+            ;ÜNTIL THIS
+
+                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+                mov     ecx,-11
+                call    GetStdHandle ;¨TODO GOOGLE GetStdHandle!!!
+                ; hStdOut = GetstdHandle( STD_OUTPUT_HANDLE)
+                ; rax = handle (for standard out)  
+
+                add    rsp, 32 ;¨This unreserves the space
+
+                sub    rsp, 32 
+                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+                mov    rcx, rax
+                lea    rdx, message ;lea = load effective adress
+                mov    r8, message_end - message
+                lea    r9, woho 
+                mov    qword[rsp+4*8],0
+
+                call   WriteFile
+
+                add    rsp, 8+8
+                add    rsp, 32   
+                ; WriteFile( hstdOut, message, length(message), &bytes, 0);
+                ;mov    rcx, rbx
+                ;mov    rdx, ldamsg
+
+
+
+
+
+                ;lea     rax, [ebp-4]
+                ;push    rax
+                ;push    (message_end - message)
+                ;push    message
+                ;push    rbx
+                ;call    WriteFile
+
+                ; ExitProcess(0)
+                ;push    0
+                add     rsp, 8
+                mov     rcx, rax
+                call    ExitProcess
+
+                ; never here
+                hlt
+
+
+
+                section .data
+            message:
+                db      'lalaaa', 10 ;¨db is defined byte
+            message_end:
+                section .bss
+            woho:
+                resq  1   ;quadword - reserve space for EIGHT bytes which is ONE quadword
             """;
 
 
+    private static string nameOfAssembly = "calculation";
 
     private int assemblyCounter;
     private string assemblyCalculations = "";
@@ -47,11 +110,11 @@ internal class Compiler
     {
         EvaluateExpression(expressionToCompile);
 
-        File.WriteAllText("miro.asm", string.Empty);
-        using (StreamWriter assemblyFile = File.AppendText("miro.asm")) 
+        File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
+        using (StreamWriter assemblyFile = File.AppendText($"{nameOfAssembly}.asm")) 
         {
             assemblyFile.WriteLine(assemblyBoilerPlateStart);
-            assemblyFile.WriteLine(assemblyCalculations);
+            //assemblyFile.WriteLine(assemblyCalculations);
             assemblyFile.WriteLine(assemblyBoilerPlateEnd);
         };
 
@@ -62,8 +125,8 @@ internal class Compiler
     {
         //Do the assembly thing!
         Process processAssembling = new Process();
-        processAssembling.StartInfo.FileName = "ml64.exe";
-        processAssembling.StartInfo.Arguments = "/c miro.asm";
+        processAssembling.StartInfo.FileName = "C:\\Users\\Miro\\AppData\\Local\\bin\\NASM\\nasm";
+        processAssembling.StartInfo.Arguments = $"-f win64 {nameOfAssembly}.asm";
         processAssembling.StartInfo.UseShellExecute = false;
         processAssembling.StartInfo.RedirectStandardOutput = true;
         processAssembling.Start();
@@ -74,7 +137,7 @@ internal class Compiler
         //Do the linky thing!
         Process processLinking = new Process();
         processLinking.StartInfo.FileName = "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.37.32822\\bin\\Hostx64\\x64\\link.exe";
-        processLinking.StartInfo.Arguments = @"/OUT:""Miro.exe"" /MANIFEST /NXCOMPAT /PDB:""Miro.pdb"" /DYNAMICBASE ""kernel32.lib"" ""user32.lib"" ""gdi32.lib"" ""winspool.lib"" ""comdlg32.lib"" ""advapi32.lib"" ""shell32.lib"" ""ole32.lib"" ""oleaut32.lib"" ""uuid.lib"" ""odbc32.lib"" ""odbccp32.lib"" /DEBUG /MACHINE:X64 /INCREMENTAL /SUBSYSTEM:CONSOLE /MANIFESTUAC:""level='asInvoker' uiAccess='false'"" /ManifestFile:""Miro.exe.intermediate.manifest"" /LTCGOUT:""Miro.iobj"" /ERRORREPORT:PROMPT /ILK:""Miro.ilk"" /NOLOGO /TLBID:1 miro.obj";
+        processLinking.StartInfo.Arguments = @$"{nameOfAssembly}.obj /subsystem:console /entry:WinMain  /libpath:path_to_libs /nodefaultlib kernel32.lib user32.lib /largeaddressaware:no";
         processLinking.StartInfo.UseShellExecute = false;
         processLinking.StartInfo.RedirectStandardOutput = true;
         processLinking.Start();
@@ -82,8 +145,9 @@ internal class Compiler
         string outputLinking = processLinking.StandardOutput.ReadToEnd();
         processLinking.WaitForExit();
 
-
-        Console.WriteLine($"WOHOOO : {outputAssembling} and {outputLinking}");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Finished assembling {outputAssembling} and linking {outputLinking}.");
+        Console.ForegroundColor = ConsoleColor.White;
     }
 
     private double EvaluateExpression(string expression)

@@ -12,3 +12,17 @@ C:\Users\Miro\source\repos\MyFirstCompilerv01\MyFirstCompiler\obj\x64\Debug\net7
 C:\Users\Miro\source\repos\MyFirstCompilerv01\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.pdb
 C:\Users\Miro\source\repos\MyFirstCompilerv01\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.genruntimeconfig.cache
 C:\Users\Miro\source\repos\MyFirstCompilerv01\MyFirstCompiler\obj\x64\Debug\net7.0\ref\MyFirstCompiler.dll
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\x64\Debug\net7.0\MyFirstCompiler.exe
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\x64\Debug\net7.0\MyFirstCompiler.deps.json
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\x64\Debug\net7.0\MyFirstCompiler.runtimeconfig.json
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\x64\Debug\net7.0\MyFirstCompiler.dll
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\bin\x64\Debug\net7.0\MyFirstCompiler.pdb
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.AssemblyInfoInputs.cache
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.AssemblyInfo.cs
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.csproj.CoreCompileInputs.cache
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.dll
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\refint\MyFirstCompiler.dll
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.pdb
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\MyFirstCompiler.genruntimeconfig.cache
+C:\Users\Miro\source\repos\MyFirstCompiler\MyFirstCompiler\obj\x64\Debug\net7.0\ref\MyFirstCompiler.dll
