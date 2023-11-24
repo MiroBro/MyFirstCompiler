@@ -1,0 +1,4 @@
+//Amazing assembly produced by NICE compiler 
+
+//Expression being assemblied below: - 1
+

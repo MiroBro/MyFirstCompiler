@@ -1,0 +1,31 @@
+//Amazing assembly produced by NICE compiler 
+
+//Expression being assemblied below: 1.0 + 2.3 * tan 0.5
+
+//Tan instruction
+IL_0000: ldc.r4 0,5
+IL_0001: stloc.0
+IL_0002: ldloc.0
+IL_0003: call float32 [System.Runtime]System.MathF::Tan(float32)
+IL_0004: stloc.1
+
+//Multiply instruction
+IL_0005: ldc.r4 0,00872686779075879
+IL_0006: stloc.2
+IL_0007: ldc.r4 2,3
+IL_0008: stloc.3
+IL_0009: ldloc.2
+IL_0010: ldloc.3
+IL_0011: mul
+IL_0012: stloc.4
+
+//Add instruction
+IL_0013: ldc.r4 0,020071795918745215
+IL_0014: stloc.5
+IL_0015: ldc.r4 1
+IL_0016: stloc.6
+IL_0017: ldloc.5
+IL_0018: ldloc.6
+IL_0019: add
+IL_0020: stloc.7
+

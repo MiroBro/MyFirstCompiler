@@ -1,0 +1,11 @@
+//Amazing assembly produced by NICE compiler 
+
+//Expression being assemblied below: sin 90
+
+//Sin instruction
+IL_0000: ldc.r4 90
+IL_0001: stloc.0
+IL_0002: ldloc.0
+IL_0003: call float32 [System.Runtime]System.MathF::Sin(float32)
+IL_0004: stloc.1
+
