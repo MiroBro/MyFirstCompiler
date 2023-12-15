@@ -1,4 +1,4 @@
-    global WinMain
+﻿    global WinMain
     extern  GetStdHandle
     extern  WriteFile
     extern  ExitProcess
@@ -15,21 +15,23 @@ WinMain:
     ;I should not google the answer, no copy paste, sit and it doesnt work
     ; 0 in hex is 0x30
 
-    mov     rax, [number]
-    mov     rcx, 10 ; Divisor for division by 10
-    lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
+    mov rax, number ; put the number 123 into rax
+    mov rcx, array_size ; counter for loop
 
 divide_loop:
-    xor     rdx, rdx ; Clear remainder
-    div     rcx ; Divide rax by 10
-    add     dl, '0' ; Convert remainder to ASCII
-    mov     [rdi], dl ; Store the digit
-    ;mov     [rdi], 0x30+rdx ; Store the digit
-    dec     rdi ; Move to the previous position in the buffer
+    mov rdx, 0 ; clear whatever remainder in it before
+    div byte[divisor] ; Divide by the value in number, rdx will have the remainder, rax will have the quotient
+    ;mov [remainder_array + rax], dl ; store remainder in reverse order in array
+    mov byte[message + rcx], 0x30+rdx ; store remainder in reverse order in array
 
-    test    rax, rax ; Check if quotient is zero
-    jnz     divide_loop ; If not, continue the loop
+    ;mov byte[message+1], 0x30+rax
 
+    ;Exit if remainder is 0
+    test rdx, rdx
+    jz end_loop
+
+    dec rcx ; move to previous index in array
+    loop divide_loop ; continue loop
 
 end_loop:
 
@@ -80,7 +82,7 @@ end_loop:
 
     section .data
     divisor db 10 ; Divisor for division by 10
-    number dq 123
+    number db 123
     remainder_array db 10 dup(0) ; Array to store remainders
     array_size equ 10
 message:

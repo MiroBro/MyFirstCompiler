@@ -26,14 +26,13 @@ internal class Compiler
             """;
 
     private string assemblyBoilerPlateEnd = """
-                ;¨CALCULATIONS HERE
-                ;¨CHANGE THIS
-                ;¨Take the number in rcx, write out what it looks like as a string, make it so it can take ANY number
-                ;¨I should not google the answer, no copy paste, sit and it doesnt work
-                ;¨
+                ;CHANGE THIS
+                ;Take the number in rcx, write out what it looks like as a string, make it so it can take ANY number
+                ;I should not google the answer, no copy paste, sit and it doesnt work
+                ; 0 in hex is 0x30
 
-                mov    byte[message], 0x34 ;move a 4 (written in hex) inte the first byte in message
-                mov    byte[message +1], 0x32 ;move a 2 into the second byte in message
+                mov    byte[message], 0x30+4 ;move a 4 (written in hex) inte the first byte in message
+                mov    byte[message +1], 0x30+2 ;move a 2 into the second byte in message
 
                 lea    rcx, message+2 ;lea loaded in the adress of message byte place 3
                 mov    rdx, 4 ;save the remaining amount of space in the message to loop through
@@ -48,8 +47,6 @@ internal class Compiler
                 sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
                 mov     ecx,-11
                 call    GetStdHandle ;¨TODO GOOGLE GetStdHandle!!!
-                ; hStdOut = GetstdHandle( STD_OUTPUT_HANDLE)
-                ; rax = handle (for standard out)  
 
                 add    rsp, 32 ;¨This unreserves the space
 
@@ -65,23 +62,7 @@ internal class Compiler
 
                 add    rsp, 8+8
                 add    rsp, 32   
-                ; WriteFile( hstdOut, message, length(message), &bytes, 0);
-                ;mov    rcx, rbx
-                ;mov    rdx, ldamsg
 
-
-
-
-
-                ;lea     rax, [ebp-4]
-                ;push    rax
-                ;push    (message_end - message)
-                ;push    message
-                ;push    rbx
-                ;call    WriteFile
-
-                ; ExitProcess(0)
-                ;push    0
                 add     rsp, 8
                 mov     rcx, rax
                 call    ExitProcess
@@ -110,12 +91,12 @@ internal class Compiler
     {
         EvaluateExpression(expressionToCompile);
 
-        File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
+        //File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
         using (StreamWriter assemblyFile = File.AppendText($"{nameOfAssembly}.asm")) 
         {
-            assemblyFile.WriteLine(assemblyBoilerPlateStart);
+            //assemblyFile.WriteLine(assemblyBoilerPlateStart);
             //assemblyFile.WriteLine(assemblyCalculations);
-            assemblyFile.WriteLine(assemblyBoilerPlateEnd);
+            //assemblyFile.WriteLine(assemblyBoilerPlateEnd);
         };
 
         CreateExecutable();

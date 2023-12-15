@@ -6,6 +6,49 @@ class Program
 {
     static void Main(string[] args)
     {
+        int rax = 123;
+        int messageAdress = 3141;
+        bool loop = true;
+        char[] toPrint = new char[10];
+        //int[] toPrint = new int[10];
+        int rdi = /* messageAdress */ + toPrint.Length - 1;
+        while (loop)
+        {
+            int rdx = rax % 10;
+            rax = rax / 10;
+            toPrint[rdi] = (char) (0x30 + rdx);
+            //toPrint[rdi] = rdx;
+            rdi--;
+
+            if (rax == 0 )
+            {
+                loop = false;
+            }
+        }
+
+        foreach (char c in toPrint)
+        {
+            Console.Write(c);
+        }
+        Console.Write("\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         if (args.Length > 0)
         {
             Console.ForegroundColor = ConsoleColor.Green;
