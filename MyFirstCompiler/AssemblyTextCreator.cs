@@ -12,6 +12,7 @@ namespace MyFirstCompiler
         private const string instructionCodeWord = "{CALCULATION_INSTRUCTION}";
 
         private const string variableNameNumberA = $"numberA{countCodeWord}";
+        private const string calcToDo = "{CALC_TO_PERFORM}";
         private const string variableNameNumberB = $"numberB{countCodeWord}";
 
         private const string actualNumberA = "{REPLACE_NUMBER_A}";
@@ -21,11 +22,20 @@ namespace MyFirstCompiler
 
         private const string replaceNumbersInDataSections = "{REPLACE_DATA_NUMBERS_HERE}";
 
-        private const string assemblyDataQuadNbrs = 
-            $"""
-            {variableNameNumberA} dq {actualNumberA};
-            {variableNameNumberB} dq {actualNumberB};
+        private const string calcMessageName = $"""
+            message{countCodeWord}:
+                db      '{calcToDo} = ', 10 ; db is defined byte
+            message_end{countCodeWord}:
             """;
+
+        private const string assemblyDataQuadNbrs = 
+        $"""
+
+            {variableNameNumberA} dq {actualNumberA}
+            {variableNameNumberB} dq {actualNumberB}
+
+            
+        """;
 
         private const string assemblyCalculation = $"""
     
@@ -43,7 +53,7 @@ namespace MyFirstCompiler
             remainder_array db 10 dup(0) ; Array to store remainders
             array_size equ 10
         message:
-            db      '          ', 10 ;¨db is defined byte
+            db      '          ', 10 ; db is defined byte
         message_end:
             section .bss
         woho:
@@ -71,6 +81,35 @@ namespace MyFirstCompiler
 
             end_loop{countCodeWord}:
 
+                ;TRY PRINTING CALCULATION
+            
+                add     rsp, 8
+                mov     rcx, rax
+            
+                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+                mov     ecx,-11
+                call    GetStdHandle 
+            
+                add    rsp, 32 ;¨This unreserves the space
+            
+                sub    rsp, 32 
+                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+                mov    rcx, rax
+                lea    rdx, message{countCodeWord} ;lea = load effective adress
+                mov    r8, message_end{countCodeWord} - message{countCodeWord}
+                lea    r9, woho 
+                mov    qword[rsp+4*8],0
+            
+                call   WriteFile
+            
+                add    rsp, 8+8
+                add    rsp, 32   
+            
+                add     rsp, 8
+                mov     rcx, rax
+
+                ;PRINT RESULT
+
                 sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
                 mov     ecx,-11
                 call    GetStdHandle 
@@ -89,9 +128,10 @@ namespace MyFirstCompiler
 
                 add    rsp, 8+8
                 add    rsp, 32   
-
+            
                 add     rsp, 8
                 mov     rcx, rax
+            
             """;
 
 
@@ -127,18 +167,20 @@ namespace MyFirstCompiler
             public int numberA;
             public int numberB;
             public TokenType instruction;
+            public string instructionString;
 
-            public Instruction(int numberA, int numberB, TokenType instruction)
+            public Instruction(int numberA, int numberB, TokenType instruction, string instructionString)
             {
                 this.numberA = numberA;
                 this.numberB = numberB;
                 this.instruction = instruction;
+                this.instructionString = instructionString;
             }
         }
 
-        public void AddInstructionToCompile(double numberA, double numberB, TokenType instruction)
+        public void AddInstructionToCompile(double numberA, double numberB, TokenType instruction, string instructionString)
         {
-            allInstruction.Add(new Instruction((int)numberA, (int)numberB, instruction));
+            allInstruction.Add(new Instruction((int)numberA, (int)numberB, instruction, instructionString));
         }
 
         public string GetAssemblyText() 
@@ -166,6 +208,8 @@ namespace MyFirstCompiler
             for (int i = 0; i < allInstruction.Count; i++)
             {
                 sbData.AppendLine(assemblyDataQuadNbrs);
+                sbData.AppendLine(calcMessageName);
+                sbData.Replace(calcToDo, allInstruction[i].instructionString);
                 sbData.Replace(countCodeWord, i.ToString());
                 sbData.Replace(actualNumberA, allInstruction[i].numberA.ToString());
                 sbData.Replace(actualNumberB, allInstruction[i].numberB.ToString());

@@ -104,7 +104,7 @@ internal class Compiler
                             var r = a + b;                            
                             stack.Push(r);
 
-                            assemblyTextCreator.AddInstructionToCompile(a, b, token.tokenType);
+                            assemblyTextCreator.AddInstructionToCompile(a, b, token.tokenType, $"{a} + {b} ");
 
                             assemblyCalculations +=
                             $"""
@@ -122,7 +122,7 @@ internal class Compiler
                             var b = stack.Pop();
                             var r = b - a;
 
-                            assemblyTextCreator.AddInstructionToCompile(b, a, token.tokenType);
+                            assemblyTextCreator.AddInstructionToCompile(b, a, token.tokenType, $"{b} - {a} ");
 
                             assemblyCalculations +=
                             $"""

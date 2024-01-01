@@ -34,6 +34,35 @@ divide_loop0:
 
 end_loop0:
 
+    ;TRY PRINTING CALCULATION
+
+    add     rsp, 8
+    mov     rcx, rax
+
+    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+    mov     ecx,-11
+    call    GetStdHandle 
+
+    add    rsp, 32 ;¨This unreserves the space
+
+    sub    rsp, 32 
+    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+    mov    rcx, rax
+    lea    rdx, message0 ;lea = load effective adress
+    mov    r8, message_end0 - message0
+    lea    r9, woho 
+    mov    qword[rsp+4*8],0
+
+    call   WriteFile
+
+    add    rsp, 8+8
+    add    rsp, 32   
+
+    add     rsp, 8
+    mov     rcx, rax
+
+    ;PRINT RESULT
+
     sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
     mov     ecx,-11
     call    GetStdHandle 
@@ -55,6 +84,7 @@ end_loop0:
 
     add     rsp, 8
     mov     rcx, rax
+
 
     mov rax, [numberA1]
     mov rbx, [numberB1]
@@ -79,6 +109,35 @@ divide_loop1:
 
 end_loop1:
 
+    ;TRY PRINTING CALCULATION
+
+    add     rsp, 8
+    mov     rcx, rax
+
+    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+    mov     ecx,-11
+    call    GetStdHandle 
+
+    add    rsp, 32 ;¨This unreserves the space
+
+    sub    rsp, 32 
+    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+    mov    rcx, rax
+    lea    rdx, message1 ;lea = load effective adress
+    mov    r8, message_end1 - message1
+    lea    r9, woho 
+    mov    qword[rsp+4*8],0
+
+    call   WriteFile
+
+    add    rsp, 8+8
+    add    rsp, 32   
+
+    add     rsp, 8
+    mov     rcx, rax
+
+    ;PRINT RESULT
+
     sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
     mov     ecx,-11
     call    GetStdHandle 
@@ -101,6 +160,7 @@ end_loop1:
     add     rsp, 8
     mov     rcx, rax
 
+
     call    ExitProcess
 
     ; never here
@@ -108,15 +168,27 @@ end_loop1:
 
     section .data
     divisor db 10 ; Divisor for division by 10
-    numberA0 dq 2;
-numberB0 dq 1;
-numberA1 dq 5;
-numberB1 dq 2;
+    
+    numberA0 dq 2
+    numberB0 dq 1
+
+    
+message0:
+    db      '2 + 1  = ', 10 ; db is defined byte
+message_end0:
+
+    numberA1 dq 5
+    numberB1 dq 2
+
+    
+message1:
+    db      '5 + 2  = ', 10 ; db is defined byte
+message_end1:
 
     remainder_array db 10 dup(0) ; Array to store remainders
     array_size equ 10
 message:
-    db      '          ', 10 ;¨db is defined byte
+    db      '          ', 10 ; db is defined byte
 message_end:
     section .bss
 woho:
