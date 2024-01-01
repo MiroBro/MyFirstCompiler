@@ -1,4 +1,4 @@
-    global WinMain
+﻿    global WinMain
     extern  GetStdHandle
     extern  WriteFile
     extern  ExitProcess
@@ -10,41 +10,42 @@
     ;In addition we are required to reserve space for shadow stack. It's custom to reserve 32 bytes in the shadow stack
 WinMain:
     sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
+    ;CHANGE THIS
+    ;Take the number in rcx, write out what it looks like as a string, make it so it can take ANY number
+    ;I should not google the answer, no copy paste, sit and it doesnt work
+    ; 0 in hex is 0x30
 
-    mov rax, [numberA0]
-    mov rbx, [numberB0]
-    add rax,rbx
-
-    sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
-
+    mov     rax, [number]
     mov     rcx, 10 ; Divisor for division by 10
     lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
 
-divide_loop0:
+divide_loop:
     xor     rdx, rdx ; Clear remainder
     div     rcx ; Divide rax by 10
     add     dl, '0' ; Convert remainder to ASCII
     mov     [rdi], dl ; Store the digit
-
+    ;mov     [rdi], 0x30+rdx ; Store the digit
     dec     rdi ; Move to the previous position in the buffer
 
     test    rax, rax ; Check if quotient is zero
-    jnz     divide_loop0 ; If not, continue the loop
+    jnz     divide_loop ; If not, continue the loop
 
 
-end_loop0:
+end_loop:
 
     sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
     mov     ecx,-11
-    call    GetStdHandle 
+    call    GetStdHandle ;¨TODO GOOGLE GetStdHandle!!!
 
     add    rsp, 32 ;¨This unreserves the space
 
     sub    rsp, 32 
     sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
     mov    rcx, rax
+    ;lea    rdx, message ;lea = load effective adress
     lea    rdx, message ;lea = load effective adress
     mov    r8, message_end - message
+    ;mov    r8, message_end - message
     lea    r9, woho 
     mov    qword[rsp+4*8],0
 
@@ -55,64 +56,16 @@ end_loop0:
 
     add     rsp, 8
     mov     rcx, rax
-
-    mov rax, [numberA1]
-    mov rbx, [numberB1]
-    add rax,rbx
-
-    sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
-
-    mov     rcx, 10 ; Divisor for division by 10
-    lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
-
-divide_loop1:
-    xor     rdx, rdx ; Clear remainder
-    div     rcx ; Divide rax by 10
-    add     dl, '0' ; Convert remainder to ASCII
-    mov     [rdi], dl ; Store the digit
-
-    dec     rdi ; Move to the previous position in the buffer
-
-    test    rax, rax ; Check if quotient is zero
-    jnz     divide_loop1 ; If not, continue the loop
-
-
-end_loop1:
-
-    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-    mov     ecx,-11
-    call    GetStdHandle 
-
-    add    rsp, 32 ;¨This unreserves the space
-
-    sub    rsp, 32 
-    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-    mov    rcx, rax
-    lea    rdx, message ;lea = load effective adress
-    mov    r8, message_end - message
-    lea    r9, woho 
-    mov    qword[rsp+4*8],0
-
-    call   WriteFile
-
-    add    rsp, 8+8
-    add    rsp, 32   
-
-    add     rsp, 8
-    mov     rcx, rax
-
     call    ExitProcess
 
     ; never here
     hlt
 
+
+
     section .data
     divisor db 10 ; Divisor for division by 10
-    numberA0 dq 2;
-numberB0 dq 1;
-numberA1 dq 5;
-numberB1 dq 2;
-
+    number dq 124
     remainder_array db 10 dup(0) ; Array to store remainders
     array_size equ 10
 message:
@@ -121,5 +74,3 @@ message_end:
     section .bss
 woho:
     resq  1   ;quadword - reserve space for EIGHT bytes which is ONE quadword
-
-

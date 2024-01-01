@@ -9,91 +9,26 @@ using System.Reflection.PortableExecutable;
 
 internal class Compiler
 {
-    //This assembly works for NASM on Windows x64 bit
-    private string assemblyBoilerPlateStart = """
-                global WinMain
-                extern  GetStdHandle
-                extern  WriteFile
-                extern  ExitProcess
-
-                section .text
-
-                ;On Wndows 64bit ABI (application binary interface) the first four parameters are passed in rcx,rdx,r8,r9 in that order. 
-                ;The return from a functions is returned to rax
-                ;In addition we are required to reserve space for shadow stack. It's custom to reserve 32 bytes in the shadow stack
-            WinMain:
-                sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
-            """;
-
-    private string assemblyBoilerPlateEnd = """
-                ;CHANGE THIS
-                ;Take the number in rcx, write out what it looks like as a string, make it so it can take ANY number
-                ;I should not google the answer, no copy paste, sit and it doesnt work
-                ; 0 in hex is 0x30
-
-                mov    byte[message], 0x30+4 ;move a 4 (written in hex) inte the first byte in message
-                mov    byte[message +1], 0x30+2 ;move a 2 into the second byte in message
-
-                lea    rcx, message+2 ;lea loaded in the adress of message byte place 3
-                mov    rdx, 4 ;save the remaining amount of space in the message to loop through
-
-            loop:
-                mov    byte[rcx], 0x20
-                inc    rcx
-                dec    rdx
-                jnz    loop
-            ;ÜNTIL THIS
-
-                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-                mov     ecx,-11
-                call    GetStdHandle ;¨TODO GOOGLE GetStdHandle!!!
-
-                add    rsp, 32 ;¨This unreserves the space
-
-                sub    rsp, 32 
-                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-                mov    rcx, rax
-                lea    rdx, message ;lea = load effective adress
-                mov    r8, message_end - message
-                lea    r9, woho 
-                mov    qword[rsp+4*8],0
-
-                call   WriteFile
-
-                add    rsp, 8+8
-                add    rsp, 32   
-
-                add     rsp, 8
-                mov     rcx, rax
-                call    ExitProcess
-
-                ; never here
-                hlt
-
-
-
-                section .data
-            message:
-                db      'lalaaa', 10 ;¨db is defined byte
-            message_end:
-                section .bss
-            woho:
-                resq  1   ;quadword - reserve space for EIGHT bytes which is ONE quadword
-            """;
-
-
     private static string nameOfAssembly = "calculation";
 
     private int assemblyCounter;
     private string assemblyCalculations = "";
 
-    public void Run(string expressionToCompile)
-    {
-        EvaluateExpression(expressionToCompile);
+    private AssemblyTextCreator assemblyTextCreator;
 
-        //File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
+    public void Run(string[] expressionToCompile)
+    {
+        assemblyTextCreator = new AssemblyTextCreator();
+
+        foreach (var expression in expressionToCompile)
+        {
+            EvaluateExpression(expression);
+        }
+
+        File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
         using (StreamWriter assemblyFile = File.AppendText($"{nameOfAssembly}.asm")) 
         {
+            assemblyFile.WriteLine(assemblyTextCreator.GetAssemblyText());
             //assemblyFile.WriteLine(assemblyBoilerPlateStart);
             //assemblyFile.WriteLine(assemblyCalculations);
             //assemblyFile.WriteLine(assemblyBoilerPlateEnd);
@@ -168,6 +103,9 @@ internal class Compiler
                             var b = stack.Pop();
                             var r = a + b;                            
                             stack.Push(r);
+
+                            assemblyTextCreator.AddInstructionToCompile(a, b, token.tokenType);
+
                             assemblyCalculations +=
                             $"""
                              pop     rcx
@@ -183,6 +121,8 @@ internal class Compiler
                             var a = stack.Pop();
                             var b = stack.Pop();
                             var r = b - a;
+
+                            assemblyTextCreator.AddInstructionToCompile(b, a, token.tokenType);
 
                             assemblyCalculations +=
                             $"""
