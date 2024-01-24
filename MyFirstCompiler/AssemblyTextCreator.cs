@@ -11,13 +11,10 @@ namespace MyFirstCompiler
         private const string countCodeWord = "{REPLACE_WITH_COUNT}";
         private const string instructionCodeWord = "{CALCULATION_INSTRUCTION}";
 
-        //private const string variableNameNumberA = $"numberA{countCodeWord}";
         private const string calcToDo = "{CALC_TO_PERFORM}";
-        //private const string variableNameNumberB = $"numberB{countCodeWord}";
 
         private const string actualNumberA = "{REPLACE_NUMBER_A}";
         private const string actualNumberB = "{REPLACE_NUMBER_B}";
-        //private const string putCalculationsHere = "{PUT_CALCULATIONS_HERE}";
         
 
         private const string replaceNumbersInDataSections = "{REPLACE_DATA_NUMBERS_HERE}";
@@ -27,26 +24,6 @@ namespace MyFirstCompiler
                 db      '{calcToDo} = ', 10 ; db is defined byte
             message_end{countCodeWord}:
             """;
-
-        /*
-        private const string assemblyDataQuadNbrs = 
-        $"""
-
-            {variableNameNumberA} dq {actualNumberA}
-            {variableNameNumberB} dq {actualNumberB}
-
-            
-        """;
-        */
-        /*
-        private const string assemblyCalculation = $"""
-    
-            mov rax, [{variableNameNumberA}]
-            mov rbx, [{variableNameNumberB}]
-            {instructionCodeWord} rax,rbx
-
-        """;
-        */
 
         private const string assemblyData = $"""
     
@@ -162,8 +139,6 @@ namespace MyFirstCompiler
                 hlt
             """;
 
-
-        //private List<Instruction> allInstruction = new List<Instruction>();
         private List<string> allInstruction = new List<string>();
 
         public List<string> theCalculationStrings = new List<string>();
@@ -206,18 +181,6 @@ namespace MyFirstCompiler
             for (int i = 0; i < allInstruction.Count; i++)
             {
                 sb.AppendLine(allInstruction[i]);
-
-                //sb.Append(allInstruction[i].instructionAssemblyString);
-
-                //sb.AppendLine(assemblyCalculation);
-
-                //sb.Replace(actualNumberA, allInstruction[i].numberA.ToString());
-                //sb.Replace(actualNumberB, allInstruction[i].numberB.ToString());
-
-                //sb.Replace(countCodeWord,i.ToString());
-
-                //sb = ReplaceInstruction(sb, allInstruction[i].instruction);
-                
             }
             sb.AppendLine(";HERE THE STACK CALCS END!!!");
             sb.AppendLine(assemblyPrint);
@@ -230,13 +193,8 @@ namespace MyFirstCompiler
             for (int i = 0; i < allInstruction.Count; i++)
             {
                 sbData.AppendLine(allInstruction[i]);
-                //sbData.Replace(countCodeWord, i.ToString());
-                //sbData.Replace(calcToDo, allInstruction[i].instructionString);
-                //sbData.Replace(actualNumberA, allInstruction[i].numberA.ToString());
-                //sbData.Replace(actualNumberB, allInstruction[i].numberB.ToString());
             }
             sbData.Replace(countCodeWord, "0");
-            //sbData.AppendLine(assemblyDataQuadNbrs);
             sbData.AppendLine(calcMessageName);
             sb.Replace(replaceNumbersInDataSections, sbData.ToString());
 
@@ -244,25 +202,5 @@ namespace MyFirstCompiler
             sb.Replace(countCodeWord, "0");
             return sb.ToString();
         }
-
-        /*
-        private StringBuilder ReplaceInstruction(StringBuilder sb, TokenType instruction)
-        {
-            switch (instruction)
-            {
-                case TokenType.Add:
-                    sb.Replace(instructionCodeWord, "add");
-                    break;
-                case TokenType.Subtract:
-                    sb.Replace(instructionCodeWord, "sub");
-                    break;
-                default:
-                    sb.Replace(instructionCodeWord, "add");
-                    break;
-            }
-            return sb; 
-        }
-        */
-
     }
 }
