@@ -22,6 +22,7 @@ internal class Compiler
 
         foreach (var expression in expressionToCompile)
         {
+            assemblyTextCreator.AddCalculationString(expression);
             EvaluateExpression(expression);
         }
 
@@ -92,6 +93,12 @@ internal class Compiler
 
                              """;
                 stack.Push(token.value);
+
+                string calc = $"""
+                             push    {(int)token.value} 
+
+                             """;
+                assemblyTextCreator.AddInstrucion(calc);
             }
             else
             {
@@ -104,9 +111,7 @@ internal class Compiler
                             var r = a + b;                            
                             stack.Push(r);
 
-                            assemblyTextCreator.AddInstructionToCompile(a, b, token.tokenType, $"{a} + {b} ");
-
-                            assemblyCalculations +=
+                            string calc =
                             $"""
                              pop     rcx
                              pop     rbx
@@ -114,6 +119,8 @@ internal class Compiler
                              push    rcx
 
                              """;
+
+                            assemblyTextCreator.AddInstrucion(calc);
                         }
                         break;
                     case TokenType.Subtract:
@@ -122,9 +129,7 @@ internal class Compiler
                             var b = stack.Pop();
                             var r = b - a;
 
-                            assemblyTextCreator.AddInstructionToCompile(b, a, token.tokenType, $"{b} - {a} ");
-
-                            assemblyCalculations +=
+                            string calc =
                             $"""
                              pop     rbx
                              pop     rcx
@@ -132,6 +137,9 @@ internal class Compiler
                              push    rcx
 
                              """;
+
+                            assemblyTextCreator.AddInstrucion(calc);
+
                             stack.Push(r);
                         }
                         break;
@@ -140,14 +148,17 @@ internal class Compiler
                             var a = stack.Pop(); 
                             var r = - a;
                             stack.Push(r);
-                            assemblyCalculations += // Cheating because I couldn't figure out how to multiply by -1 hahahah
+                            string calc = // Cheating because I couldn't figure out how to multiply by -1 hahahah
                             $"""
                              mov     rcx, 0 
                              pop     rbx
                              sub     rcx, rbx
                              push    rcx
 
-                             """; 
+                             """;
+                            assemblyTextCreator.AddInstrucion(calc);
+                            //assemblyTextCreator.AddInstructionToCompile(r, a, token.tokenType, $" - {a} ", calc);
+
                         }
                         break;
                     case TokenType.Divide:
@@ -155,19 +166,8 @@ internal class Compiler
                             var a = stack.Pop();
                             var b = stack.Pop();
                             var r = a / b;
-                            stack.Push(r); //Need to do integer divide! Theres a remainder func to give rest READ how divide and mult work!! add modulus operator! DONT CHUCK FLOATS
-                            /*assemblyCalculations +=
-                            $"""
-                             pop     edx
-                             pop     eax
-                             div     2
-                             mov     rcx, edx
-                             push    rcx
-
-                             """;*/
-                            //RDX:RAX / r/m64 = RAX(Quotient), RDX (Remainder)
-                            // 6 / 3
-                            assemblyCalculations += 
+                            stack.Push(r); 
+                            string calc = 
                             $"""
                              mov     rdx, 0
                              pop     rcx
@@ -176,17 +176,8 @@ internal class Compiler
                              push    rax
 
                              """;
-                            
-                            /*assemblyCalculations += 
-                            $"""
-                             mov     rax, 0 
-                             pop     rbx
-                             ;sub     rbx, rbx
-                             div     rbx
-                             push    rcx
-
-                             """;
-                            */
+                            assemblyTextCreator.AddInstrucion(calc);
+                            //assemblyTextCreator.AddInstructionToCompile(a, b, token.tokenType, $"{b}  / {a} ", calc);
                         }
                         break;
                     case TokenType.Multiply:
@@ -195,7 +186,7 @@ internal class Compiler
                             var b = stack.Pop();
                             var r = a * b;
                             stack.Push(r);
-                            assemblyCalculations +=
+                            string calc =
                             $"""
                              pop     rcx
                              pop     rax
@@ -203,6 +194,8 @@ internal class Compiler
                              push    rax
 
                              """;
+                            assemblyTextCreator.AddInstrucion(calc);
+                            //assemblyTextCreator.AddInstructionToCompile(calc);
                         }
                         break;
                     case TokenType.Sin:
@@ -229,11 +222,18 @@ internal class Compiler
                 }
             }
         }
-        assemblyCalculations +=
+        string finalCalc =
+            $"""
+            pop     rcx
+            mov     rax, rcx
+            """;
+        assemblyTextCreator.AddInstrucion(finalCalc);
+        /*assemblyCalculations +=
             $"""
             pop     rcx
 
             """;
+        */
         return stack.Pop();
     }
 

@@ -11,9 +11,9 @@ namespace MyFirstCompiler
         private const string countCodeWord = "{REPLACE_WITH_COUNT}";
         private const string instructionCodeWord = "{CALCULATION_INSTRUCTION}";
 
-        private const string variableNameNumberA = $"numberA{countCodeWord}";
+        //private const string variableNameNumberA = $"numberA{countCodeWord}";
         private const string calcToDo = "{CALC_TO_PERFORM}";
-        private const string variableNameNumberB = $"numberB{countCodeWord}";
+        //private const string variableNameNumberB = $"numberB{countCodeWord}";
 
         private const string actualNumberA = "{REPLACE_NUMBER_A}";
         private const string actualNumberB = "{REPLACE_NUMBER_B}";
@@ -28,6 +28,7 @@ namespace MyFirstCompiler
             message_end{countCodeWord}:
             """;
 
+        /*
         private const string assemblyDataQuadNbrs = 
         $"""
 
@@ -36,7 +37,8 @@ namespace MyFirstCompiler
 
             
         """;
-
+        */
+        /*
         private const string assemblyCalculation = $"""
     
             mov rax, [{variableNameNumberA}]
@@ -44,6 +46,7 @@ namespace MyFirstCompiler
             {instructionCodeWord} rax,rbx
 
         """;
+        */
 
         private const string assemblyData = $"""
     
@@ -160,7 +163,20 @@ namespace MyFirstCompiler
             """;
 
 
-        private List<Instruction> allInstruction = new List<Instruction>();
+        //private List<Instruction> allInstruction = new List<Instruction>();
+        private List<string> allInstruction = new List<string>();
+
+        public List<string> theCalculationStrings = new List<string>();
+
+        public void AddCalculationString(string calculationString) 
+        { 
+            theCalculationStrings.Add(calculationString);   
+        }
+
+        public void AddInstrucion(string instrucion)
+        {
+            allInstruction.Add(instrucion);
+        }
 
         private class Instruction
         {
@@ -168,19 +184,16 @@ namespace MyFirstCompiler
             public int numberB;
             public TokenType instruction;
             public string instructionString;
+            public string instructionAssemblyString;
 
-            public Instruction(int numberA, int numberB, TokenType instruction, string instructionString)
+            public Instruction(int numberA, int numberB, TokenType instruction, string instructionString, string instructionAssemblyString)
             {
                 this.numberA = numberA;
                 this.numberB = numberB;
                 this.instruction = instruction;
                 this.instructionString = instructionString;
+                this.instructionAssemblyString = instructionAssemblyString;
             }
-        }
-
-        public void AddInstructionToCompile(double numberA, double numberB, TokenType instruction, string instructionString)
-        {
-            allInstruction.Add(new Instruction((int)numberA, (int)numberB, instruction, instructionString));
         }
 
         public string GetAssemblyText() 
@@ -188,37 +201,51 @@ namespace MyFirstCompiler
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(assemblyStart);
+            sb.AppendLine(";HERE COME THE STACK CALCS");
+            //calculate the actual assembly
             for (int i = 0; i < allInstruction.Count; i++)
             {
-                sb.AppendLine(assemblyCalculation);
-                sb.AppendLine(assemblyPrint);
+                sb.AppendLine(allInstruction[i]);
 
-                sb.Replace(actualNumberA, allInstruction[i].numberA.ToString());
-                sb.Replace(actualNumberB, allInstruction[i].numberB.ToString());
+                //sb.Append(allInstruction[i].instructionAssemblyString);
 
-                sb.Replace(countCodeWord,i.ToString());
+                //sb.AppendLine(assemblyCalculation);
 
-                sb = ReplaceInstruction(sb, allInstruction[i].instruction);
+                //sb.Replace(actualNumberA, allInstruction[i].numberA.ToString());
+                //sb.Replace(actualNumberB, allInstruction[i].numberB.ToString());
+
+                //sb.Replace(countCodeWord,i.ToString());
+
+                //sb = ReplaceInstruction(sb, allInstruction[i].instruction);
+                
             }
+            sb.AppendLine(";HERE THE STACK CALCS END!!!");
+            sb.AppendLine(assemblyPrint);
 
             sb.AppendLine(assemblyEnd);
             sb.AppendLine(assemblyData);
 
+            //Add the print
             StringBuilder sbData = new StringBuilder();
             for (int i = 0; i < allInstruction.Count; i++)
             {
-                sbData.AppendLine(assemblyDataQuadNbrs);
-                sbData.AppendLine(calcMessageName);
-                sbData.Replace(calcToDo, allInstruction[i].instructionString);
-                sbData.Replace(countCodeWord, i.ToString());
-                sbData.Replace(actualNumberA, allInstruction[i].numberA.ToString());
-                sbData.Replace(actualNumberB, allInstruction[i].numberB.ToString());
+                sbData.AppendLine(allInstruction[i]);
+                //sbData.Replace(countCodeWord, i.ToString());
+                //sbData.Replace(calcToDo, allInstruction[i].instructionString);
+                //sbData.Replace(actualNumberA, allInstruction[i].numberA.ToString());
+                //sbData.Replace(actualNumberB, allInstruction[i].numberB.ToString());
             }
-
+            sbData.Replace(countCodeWord, "0");
+            //sbData.AppendLine(assemblyDataQuadNbrs);
+            sbData.AppendLine(calcMessageName);
             sb.Replace(replaceNumbersInDataSections, sbData.ToString());
+
+            sb.Replace(calcToDo, theCalculationStrings[0].ToString());
+            sb.Replace(countCodeWord, "0");
             return sb.ToString();
         }
 
+        /*
         private StringBuilder ReplaceInstruction(StringBuilder sb, TokenType instruction)
         {
             switch (instruction)
@@ -235,5 +262,7 @@ namespace MyFirstCompiler
             }
             return sb; 
         }
+        */
+
     }
 }
