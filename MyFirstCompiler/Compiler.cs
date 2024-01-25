@@ -19,8 +19,9 @@ internal class Compiler
 
         foreach (var expression in expressionToCompile)
         {
-            assemblyTextCreator.AddCalculationString(expression);
-            EvaluateExpression(expression);
+            AssemblyTextCreator.DesiredCalc desiredCalculation = new AssemblyTextCreator.DesiredCalc() {expression = expression};
+            EvaluateExpression(desiredCalculation);
+            assemblyTextCreator.AddDesiredCalculation(desiredCalculation);
         }
 
         File.WriteAllText($"{nameOfAssembly}.asm", string.Empty);
@@ -61,18 +62,18 @@ internal class Compiler
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    private double EvaluateExpression(string expression)
+    private double EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
     {
-        Tokenizer tokenizer = new Tokenizer(new StringReader(expression));
+        Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
         List<Token> tokensInOrder = tokenizer.Tokenize();
 
         ShuntingYardAlgorithm sya = new ShuntingYardAlgorithm();
         Queue<Token> outputQueue = sya.GetOutputQueue(tokensInOrder);
 
-        return CalculateOutputQueue(outputQueue);
+        return CalculateOutputQueue(outputQueue, desiredCalculation);
     }
 
-    private double CalculateOutputQueue(Queue<Token> outputQueue)
+    private double CalculateOutputQueue(Queue<Token> outputQueue, AssemblyTextCreator.DesiredCalc calcToDo)
     {
         Stack<double> stack = new Stack<double>();
 
@@ -87,7 +88,7 @@ internal class Compiler
                                 push    {(int)token.value} 
 
                              """;
-                assemblyTextCreator.AddInstrucion(calc);
+                calcToDo.AddInstrucion(calc);
             }
             else
             {
@@ -110,7 +111,7 @@ internal class Compiler
 
                              """;
 
-                            assemblyTextCreator.AddInstrucion(calc);
+                            calcToDo.AddInstrucion(calc);
                         }
                         break;
                     case TokenType.Subtract:
@@ -129,7 +130,7 @@ internal class Compiler
 
                              """;
 
-                            assemblyTextCreator.AddInstrucion(calc);
+                            calcToDo.AddInstrucion(calc);
 
                             stack.Push(r);
                         }
@@ -148,7 +149,7 @@ internal class Compiler
                                  push    rcx
 
                              """;
-                            assemblyTextCreator.AddInstrucion(calc);
+                            calcToDo.AddInstrucion(calc);
                         }
                         break;
                     case TokenType.Divide:
@@ -167,7 +168,7 @@ internal class Compiler
                                  push    rax
 
                              """;
-                            assemblyTextCreator.AddInstrucion(calc);
+                            calcToDo.AddInstrucion(calc);
                         }
                         break;
                     case TokenType.Multiply:
@@ -185,7 +186,7 @@ internal class Compiler
                                  push    rax
 
                              """;
-                            assemblyTextCreator.AddInstrucion(calc);
+                            calcToDo.AddInstrucion(calc);
                         }
                         break;
                     case TokenType.Sin:
@@ -217,7 +218,7 @@ internal class Compiler
                 pop     rcx
                 mov     rax, rcx
             """;
-        assemblyTextCreator.AddInstrucion(finalCalc);
+        calcToDo.AddInstrucion(finalCalc);
         return stack.Pop();
     }
 }

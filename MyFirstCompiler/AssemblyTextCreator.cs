@@ -20,11 +20,19 @@ namespace MyFirstCompiler
             message_end{countCodeWord}:
             """;
 
-        private const string assemblyData = $"""
+        private const string calcData = $"""
+            {replaceNumbersInDataSections}
+        """;
+
+        private const string beginningOfData = $"""
     
             section .data
+        """;
+        private const string standardData = $"""
+    
+            
             divisor db 10 ; Divisor for division by 10
-            {replaceNumbersInDataSections}
+            
             remainder_array db 10 dup(0) ; Array to store remainders
             array_size equ 10
         message:
@@ -36,7 +44,7 @@ namespace MyFirstCompiler
 
         """;
 
-        private const string assemblyPrint = $"""
+        private const string printCalcAndResult = $"""
                 call    IntToASCII  
 
                 ;prepping for printing calc
@@ -139,18 +147,22 @@ namespace MyFirstCompiler
 
            """;
 
-        private List<string> allInstruction = new List<string>();
+        public List<DesiredCalc> calcToDos = new List<DesiredCalc>();
 
-        public List<string> theCalculationStrings = new List<string>();
-
-        public void AddCalculationString(string calculationString) 
-        { 
-            theCalculationStrings.Add(calculationString);   
+        public void AddDesiredCalculation(DesiredCalc desiredCalc)
+        {
+            calcToDos.Add(desiredCalc);
         }
 
-        public void AddInstrucion(string instrucion)
+        public class DesiredCalc 
         {
-            allInstruction.Add(instrucion);
+            public string expression = "";
+            public List<string> allInstructions = new List<string>();
+
+            public void AddInstrucion(string instrucion) 
+            {
+                allInstructions.Add(instrucion);
+            }
         }
 
         private class Instruction
@@ -179,32 +191,39 @@ namespace MyFirstCompiler
             sb.AppendLine(intToASCIIFunction);
             sb.AppendLine(printString);
             sb.AppendLine(winMainStart);
-            sb.AppendLine("\n;Start of invokation of stack calculations");
-            //calculate the actual assembly
-            for (int i = 0; i < allInstruction.Count; i++)
-            {
-                sb.AppendLine(allInstruction[i]);
-            }
-            sb.AppendLine("\n;End of stack calculations\n");
 
-            sb.AppendLine("\n;Start of result transformation from number to string, and eventually print calculation string and result");
-            sb.AppendLine(assemblyPrint);
+            for (int i = 0; i < calcToDos.Count; i++)
+            {
+                sb.AppendLine("\n;Start of invokation of stack calculations");
+                //calculate the actual assembly
+                for (int j = 0; j < calcToDos[i].allInstructions.Count; j++)
+                {
+                    sb.AppendLine(calcToDos[i].allInstructions[j]);
+                }
+                sb.AppendLine("\n;End of stack calculations\n");
+
+                sb.AppendLine(printCalcAndResult);
+
+                sb.Replace(calcToDo, calcToDos[i].expression);
+                sb.Replace(countCodeWord, i.ToString());
+            }
 
             sb.AppendLine(assemblyEnd);
-            sb.AppendLine(assemblyData);
+            sb.AppendLine(beginningOfData);
 
-            //Add the print
-            StringBuilder sbData = new StringBuilder();
-            for (int i = 0; i < allInstruction.Count; i++)
+            for (int i = 0; i < calcToDos.Count; i++)
             {
-                sbData.AppendLine(allInstruction[i]);
-            }
-            sbData.Replace(countCodeWord, "0");
-            sbData.AppendLine(calcMessageName);
-            sb.Replace(replaceNumbersInDataSections, sbData.ToString());
+                sb.AppendLine(calcData);
 
-            sb.Replace(calcToDo, theCalculationStrings[0].ToString());
-            sb.Replace(countCodeWord, "0");
+                StringBuilder sbData = new StringBuilder();
+                sbData.AppendLine(calcMessageName);
+                sbData.Replace(countCodeWord, i.ToString());
+                sbData.Replace(calcToDo, calcToDos[i].expression);
+                sb.Replace(replaceNumbersInDataSections, sbData.ToString());
+            }
+
+            sb.AppendLine(standardData);
+
             return sb.ToString();
         }
     }
