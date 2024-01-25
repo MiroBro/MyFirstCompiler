@@ -9,13 +9,8 @@ namespace MyFirstCompiler
     internal class AssemblyTextCreator
     {
         private const string countCodeWord = "{REPLACE_WITH_COUNT}";
-        private const string instructionCodeWord = "{CALCULATION_INSTRUCTION}";
 
         private const string calcToDo = "{CALC_TO_PERFORM}";
-
-        private const string actualNumberA = "{REPLACE_NUMBER_A}";
-        private const string actualNumberB = "{REPLACE_NUMBER_B}";
-        
 
         private const string replaceNumbersInDataSections = "{REPLACE_DATA_NUMBERS_HERE}";
 
@@ -44,11 +39,8 @@ namespace MyFirstCompiler
         private const string assemblyPrint = $"""
                 call    IntToASCII  
 
-               
-
                 ;TRY PRINTING CALCULATION
             
-
                 mov     rcx, rax
             
                 sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
@@ -73,29 +65,12 @@ namespace MyFirstCompiler
                 add     rsp, 8
                 mov     rcx, rax
 
-                ;PRINT RESULT
-
-                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-                mov     ecx,-11
-                call    GetStdHandle 
-
-                add    rsp, 32 ;¨This unreserves the space
-
-                sub    rsp, 32 
-                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-                mov    rcx, rax
+                ;moving stuff so it can be used for printing
                 lea    rdx, message ;lea = load effective adress
                 mov    r8, message_end - message
-                lea    r9, woho 
-                mov    qword[rsp+4*8],0
+                call PrintString
 
-                call   WriteFile
-
-                add    rsp, 8+8
-                add    rsp, 32   
-            
-                add     rsp, 8
-                mov     rcx, rax
+                ;mov     rcx, rax
             
             """;
 
@@ -156,8 +131,9 @@ namespace MyFirstCompiler
             """;
 
         private const string printString = """
+
            ;TODO: Add adress and length passed in (as in I put htem in THESE registers) - MAKE SURE SFTER EXPRESSION CALCULATOR PUTS IN RCX move it to the right register
-           ; remove hardcoded number bits
+           ;Assumes the adress of the message being printed is stored in rdx, and assumes the length of the message is stored in r8 
            PrintString:
                sub     rsp, 8
                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
@@ -169,8 +145,8 @@ namespace MyFirstCompiler
                sub    rsp, 32 
                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
                mov    rcx, rax
-               lea    rdx, message ;lea = load effective adress
-               mov    r8, message_end - message
+               ;lea    rdx, message ;lea = load effective adress
+               ;mov    r8, message_end - message
                lea    r9, woho ; this stores the lenght of the file that it wrote - used to CHECK, CHANGE WOHO name to something sensible
                mov    qword[rsp+4*8],0
 
@@ -181,6 +157,7 @@ namespace MyFirstCompiler
 
                add     rsp, 8
            	   ret
+
            """;
 
         private List<string> allInstruction = new List<string>();
@@ -221,6 +198,7 @@ namespace MyFirstCompiler
 
             sb.AppendLine(assemblyStart);
             sb.AppendLine(intToASCIIFunction);
+            sb.AppendLine(printString);
             sb.AppendLine(winMainStart);
             sb.AppendLine("\n;Start of invokation of stack calculations");
             //calculate the actual assembly
