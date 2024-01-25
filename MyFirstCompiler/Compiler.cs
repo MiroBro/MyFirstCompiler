@@ -83,7 +83,8 @@ internal class Compiler
                 stack.Push(token.value);
 
                 string calc = $"""
-                             push    {(int)token.value} 
+
+                                push    {(int)token.value} 
 
                              """;
                 assemblyTextCreator.AddInstrucion(calc);
@@ -101,10 +102,11 @@ internal class Compiler
 
                             string calc =
                             $"""
-                             pop     rcx
-                             pop     rbx
-                             add     rcx, rbx
-                             push    rcx
+
+                                 pop     rcx
+                                 pop     rbx
+                                 add     rcx, rbx
+                                 push    rcx
 
                              """;
 
@@ -119,10 +121,11 @@ internal class Compiler
 
                             string calc =
                             $"""
-                             pop     rbx
-                             pop     rcx
-                             sub     rcx, rbx
-                             push    rcx
+
+                                 pop     rbx
+                                 pop     rcx
+                                 sub     rcx, rbx
+                                 push    rcx
 
                              """;
 
@@ -138,10 +141,11 @@ internal class Compiler
                             stack.Push(r);
                             string calc = // Cheating because I couldn't figure out how to multiply by -1 hahahah
                             $"""
-                             mov     rcx, 0 
-                             pop     rbx
-                             sub     rcx, rbx
-                             push    rcx
+
+                                 mov     rcx, 0 
+                                 pop     rbx
+                                 sub     rcx, rbx
+                                 push    rcx
 
                              """;
                             assemblyTextCreator.AddInstrucion(calc);
@@ -155,11 +159,12 @@ internal class Compiler
                             stack.Push(r);
                             string calc =
                             $"""
-                             mov     rdx, 0
-                             pop     rcx
-                             pop     rax
-                             div     rcx
-                             push    rax
+
+                                 mov     rdx, 0
+                                 pop     rcx
+                                 pop     rax
+                                 div     rcx
+                                 push    rax
 
                              """;
                             assemblyTextCreator.AddInstrucion(calc);
@@ -173,10 +178,11 @@ internal class Compiler
                             stack.Push(r);
                             string calc =
                             $"""
-                             pop     rcx
-                             pop     rax
-                             mul     rcx
-                             push    rax
+
+                                 pop     rcx
+                                 pop     rax
+                                 mul     rcx
+                                 push    rax
 
                              """;
                             assemblyTextCreator.AddInstrucion(calc);
@@ -208,8 +214,8 @@ internal class Compiler
         }
         string finalCalc =
             $"""
-            pop     rcx
-            mov     rax, rcx
+                pop     rcx
+                mov     rax, rcx
             """;
         assemblyTextCreator.AddInstrucion(finalCalc);
         return stack.Pop();

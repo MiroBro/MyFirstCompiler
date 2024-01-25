@@ -139,6 +139,60 @@ namespace MyFirstCompiler
                 hlt
             """;
 
+        private const string intToASCIIFunction = """
+            ;This assembly function will transform the value in rax into ASCII and put it into 'message'
+            IntToASCII:
+                sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
+
+                mov     rcx, 10 ; Divisor for division by 10
+                lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
+
+            divide_loop0:
+                xor     rdx, rdx ; Clear remainder
+                div     rcx ; Divide rax by 10
+                add     dl, '0' ; Convert remainder to ASCII
+                mov     [rdi], dl ; Store the digit
+
+                dec     rdi ; Move to the previous position in the buffer
+
+                test    rax, rax ; Check if quotient is zero
+                jnz     divide_loop0 ; If not, continue the loop
+
+
+            end_loop0:
+
+                add     rsp, 8
+            	ret
+            """;
+
+        private const string printString = """
+           ;TODO: Add adress and length passed in (as in I put htem in THESE registers) - MAKE SURE SFTER EXPRESSION CALCULATOR PUTS IN RCX move it to the right register
+           ; remove hardcoded number bits
+           PrintString:
+               sub     rsp, 8
+               sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+               mov     ecx,-11
+               call    GetStdHandle 
+
+               add    rsp, 32 ;¨This unreserves the space
+
+               sub    rsp, 32 
+               sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+               mov    rcx, rax
+               lea    rdx, message ;lea = load effective adress
+               mov    r8, message_end - message
+               lea    r9, woho ; this stores the lenght of the file that it wrote - used to CHECK, CHANGE WOHO name to something sensible
+               mov    qword[rsp+4*8],0
+
+               call   WriteFile
+
+               add    rsp, 8+8
+               add    rsp, 32   
+
+               add     rsp, 8
+           	   ret
+           """;
+
         private List<string> allInstruction = new List<string>();
 
         public List<string> theCalculationStrings = new List<string>();
@@ -176,13 +230,15 @@ namespace MyFirstCompiler
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(assemblyStart);
-            sb.AppendLine(";HERE COME THE STACK CALCS");
+            sb.AppendLine("\n;Start of invokation of stack calculations");
             //calculate the actual assembly
             for (int i = 0; i < allInstruction.Count; i++)
             {
                 sb.AppendLine(allInstruction[i]);
             }
-            sb.AppendLine(";HERE THE STACK CALCS END!!!");
+            sb.AppendLine("\n;End of stack calculations\n");
+
+            sb.AppendLine("\n;Start of result transformation from number to string, and eventually print calculation string and result");
             sb.AppendLine(assemblyPrint);
 
             sb.AppendLine(assemblyEnd);
