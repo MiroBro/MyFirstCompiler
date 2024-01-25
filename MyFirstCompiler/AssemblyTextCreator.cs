@@ -124,6 +124,9 @@ namespace MyFirstCompiler
 
                 section .text
 
+            """;
+
+        private const string winMainStart = """
                 ;On Wndows 64bit ABI (application binary interface) the first four parameters are passed in rcx,rdx,r8,r9 in that order. 
                 ;The return from a functions is returned to rax
                 ;In addition we are required to reserve space for shadow stack. It's custom to reserve 32 bytes in the shadow stack
@@ -140,6 +143,7 @@ namespace MyFirstCompiler
             """;
 
         private const string intToASCIIFunction = """
+
             ;This assembly function will transform the value in rax into ASCII and put it into 'message'
             IntToASCII:
                 sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
@@ -147,7 +151,7 @@ namespace MyFirstCompiler
                 mov     rcx, 10 ; Divisor for division by 10
                 lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
 
-            divide_loop0:
+            divide_loop_:
                 xor     rdx, rdx ; Clear remainder
                 div     rcx ; Divide rax by 10
                 add     dl, '0' ; Convert remainder to ASCII
@@ -156,13 +160,14 @@ namespace MyFirstCompiler
                 dec     rdi ; Move to the previous position in the buffer
 
                 test    rax, rax ; Check if quotient is zero
-                jnz     divide_loop0 ; If not, continue the loop
+                jnz     divide_loop_ ; If not, continue the loop
 
 
-            end_loop0:
+            end_loop_:
 
                 add     rsp, 8
             	ret
+
             """;
 
         private const string printString = """
@@ -230,6 +235,8 @@ namespace MyFirstCompiler
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(assemblyStart);
+            //sb.AppendLine(intToASCIIFunction);
+            sb.AppendLine(winMainStart);
             sb.AppendLine("\n;Start of invokation of stack calculations");
             //calculate the actual assembly
             for (int i = 0; i < allInstruction.Count; i++)
