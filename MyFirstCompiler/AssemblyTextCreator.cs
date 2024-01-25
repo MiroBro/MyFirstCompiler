@@ -39,31 +39,10 @@ namespace MyFirstCompiler
         private const string assemblyPrint = $"""
                 call    IntToASCII  
 
-                ;TRY PRINTING CALCULATION
-            
-                mov     rcx, rax
-            
-                sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-                mov     ecx,-11
-                call    GetStdHandle 
-            
-                add    rsp, 32 ;¨This unreserves the space
-            
-                sub    rsp, 32 
-                sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-                mov    rcx, rax
+                ;prepping for printing calc
                 lea    rdx, message{countCodeWord} ;lea = load effective adress
                 mov    r8, message_end{countCodeWord} - message{countCodeWord}
-                lea    r9, woho 
-                mov    qword[rsp+4*8],0
-            
-                call   WriteFile
-            
-                add    rsp, 8+8
-                add    rsp, 32   
-            
-                add     rsp, 8
-                mov     rcx, rax
+                call PrintString
 
                 ;moving stuff so it can be used for printing
                 lea    rdx, message ;lea = load effective adress
