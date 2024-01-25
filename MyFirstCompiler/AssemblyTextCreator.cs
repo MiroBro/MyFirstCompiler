@@ -42,28 +42,13 @@ namespace MyFirstCompiler
         """;
 
         private const string assemblyPrint = $"""
-                sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
+                call    IntToASCII  
 
-                mov     rcx, 10 ; Divisor for division by 10
-                lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
-
-            divide_loop{countCodeWord}:
-                xor     rdx, rdx ; Clear remainder
-                div     rcx ; Divide rax by 10
-                add     dl, '0' ; Convert remainder to ASCII
-                mov     [rdi], dl ; Store the digit
-
-                dec     rdi ; Move to the previous position in the buffer
-
-                test    rax, rax ; Check if quotient is zero
-                jnz     divide_loop{countCodeWord} ; If not, continue the loop
-
-
-            end_loop{countCodeWord}:
+               
 
                 ;TRY PRINTING CALCULATION
             
-                add     rsp, 8
+
                 mov     rcx, rax
             
                 sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
@@ -235,7 +220,7 @@ namespace MyFirstCompiler
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(assemblyStart);
-            //sb.AppendLine(intToASCIIFunction);
+            sb.AppendLine(intToASCIIFunction);
             sb.AppendLine(winMainStart);
             sb.AppendLine("\n;Start of invokation of stack calculations");
             //calculate the actual assembly
