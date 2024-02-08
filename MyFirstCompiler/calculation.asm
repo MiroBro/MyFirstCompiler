@@ -5,160 +5,95 @@
 
     section .text
 
+
+;This assembly function will transform the value in rax into ASCII and put it into 'message'
+IntToASCII:
+    sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
+
+    mov     rcx, 10 ; Divisor for division by 10
+    lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
+
+divide_loop_:
+    xor     rdx, rdx ; Clear remainder
+    div     rcx ; Divide rax by 10
+    add     dl, '0' ; Convert remainder to ASCII
+    mov     [rdi], dl ; Store the digit
+
+    dec     rdi ; Move to the previous position in the buffer
+
+    test    rax, rax ; Check if quotient is zero
+    jnz     divide_loop_ ; If not, continue the loop
+
+
+end_loop_:
+
+    add     rsp, 8
+	ret
+
+
+;TODO: Add adress and length passed in (as in I put htem in THESE registers) - MAKE SURE SFTER EXPRESSION CALCULATOR PUTS IN RCX move it to the right register
+;Assumes the adress of the message being printed is stored in rdx, and assumes the length of the message is stored in r8 
+PrintString:
+    sub     rsp, 8
+    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
+    mov     ecx,-11
+    call    GetStdHandle 
+
+    add    rsp, 32 ;¨This unreserves the space
+
+    sub    rsp, 32 
+    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
+    mov    rcx, rax
+    ;lea    rdx, message ;lea = load effective adress
+    ;mov    r8, message_end - message
+    lea    r9, woho ; this stores the lenght of the file that it wrote - used to CHECK, CHANGE WOHO name to something sensible
+    mov    qword[rsp+4*8],0
+
+    call   WriteFile
+
+    add    rsp, 8+8
+    add    rsp, 32   
+
+    add     rsp, 8
+	   ret
+
     ;On Wndows 64bit ABI (application binary interface) the first four parameters are passed in rcx,rdx,r8,r9 in that order. 
     ;The return from a functions is returned to rax
     ;In addition we are required to reserve space for shadow stack. It's custom to reserve 32 bytes in the shadow stack
 WinMain:
     sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
 
-    mov rax, [numberA0]
-    mov rbx, [numberB0]
-    add rax,rbx
+;Start of invokation of stack calculations
 
-    sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
-
-    mov     rcx, 10 ; Divisor for division by 10
-    lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
-
-divide_loop0:
-    xor     rdx, rdx ; Clear remainder
-    div     rcx ; Divide rax by 10
-    add     dl, '0' ; Convert remainder to ASCII
-    mov     [rdi], dl ; Store the digit
-
-    dec     rdi ; Move to the previous position in the buffer
-
-    test    rax, rax ; Check if quotient is zero
-    jnz     divide_loop0 ; If not, continue the loop
+   push    5 
 
 
-end_loop0:
+   push    8 
 
-    ;TRY PRINTING CALCULATION
 
-    add     rsp, 8
-    mov     rcx, rax
+    pop     rcx
+    pop     rbx
+    add     rcx, rbx
+    push    rcx
 
-    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-    mov     ecx,-11
-    call    GetStdHandle 
+    pop     rcx
+    mov     rax, rcx
 
-    add    rsp, 32 ;¨This unreserves the space
+;End of stack calculations
 
-    sub    rsp, 32 
-    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-    mov    rcx, rax
+    call    IntToASCII  
+
+    ;prepping for printing calc
     lea    rdx, message0 ;lea = load effective adress
     mov    r8, message_end0 - message0
-    lea    r9, woho 
-    mov    qword[rsp+4*8],0
+    call PrintString
 
-    call   WriteFile
-
-    add    rsp, 8+8
-    add    rsp, 32   
-
-    add     rsp, 8
-    mov     rcx, rax
-
-    ;PRINT RESULT
-
-    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-    mov     ecx,-11
-    call    GetStdHandle 
-
-    add    rsp, 32 ;¨This unreserves the space
-
-    sub    rsp, 32 
-    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-    mov    rcx, rax
+    ;moving stuff so it can be used for printing
     lea    rdx, message ;lea = load effective adress
     mov    r8, message_end - message
-    lea    r9, woho 
-    mov    qword[rsp+4*8],0
+    call PrintString
 
-    call   WriteFile
-
-    add    rsp, 8+8
-    add    rsp, 32   
-
-    add     rsp, 8
-    mov     rcx, rax
-
-
-    mov rax, [numberA1]
-    mov rbx, [numberB1]
-    add rax,rbx
-
-    sub     rsp, 8 ;It's so iternal stack is aligned to 16 bytes, if not doing this it would be misaligned with 8 bytes
-
-    mov     rcx, 10 ; Divisor for division by 10
-    lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
-
-divide_loop1:
-    xor     rdx, rdx ; Clear remainder
-    div     rcx ; Divide rax by 10
-    add     dl, '0' ; Convert remainder to ASCII
-    mov     [rdi], dl ; Store the digit
-
-    dec     rdi ; Move to the previous position in the buffer
-
-    test    rax, rax ; Check if quotient is zero
-    jnz     divide_loop1 ; If not, continue the loop
-
-
-end_loop1:
-
-    ;TRY PRINTING CALCULATION
-
-    add     rsp, 8
-    mov     rcx, rax
-
-    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-    mov     ecx,-11
-    call    GetStdHandle 
-
-    add    rsp, 32 ;¨This unreserves the space
-
-    sub    rsp, 32 
-    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-    mov    rcx, rax
-    lea    rdx, message1 ;lea = load effective adress
-    mov    r8, message_end1 - message1
-    lea    r9, woho 
-    mov    qword[rsp+4*8],0
-
-    call   WriteFile
-
-    add    rsp, 8+8
-    add    rsp, 32   
-
-    add     rsp, 8
-    mov     rcx, rax
-
-    ;PRINT RESULT
-
-    sub     rsp, 32 ;¨This is to reserve space for shadow stack space, you always reserve space for four variables
-    mov     ecx,-11
-    call    GetStdHandle 
-
-    add    rsp, 32 ;¨This unreserves the space
-
-    sub    rsp, 32 
-    sub    rsp, 8+8 ;¨The first 8 is for the FIFTH parameret, but you cant just move it 8 because it needs to be 16 byte aligned when we call a function! 
-    mov    rcx, rax
-    lea    rdx, message ;lea = load effective adress
-    mov    r8, message_end - message
-    lea    r9, woho 
-    mov    qword[rsp+4*8],0
-
-    call   WriteFile
-
-    add    rsp, 8+8
-    add    rsp, 32   
-
-    add     rsp, 8
-    mov     rcx, rax
+    ;mov     rcx, rax
 
 
     call    ExitProcess
@@ -167,24 +102,14 @@ end_loop1:
     hlt
 
     section .data
-    divisor db 10 ; Divisor for division by 10
-    
-    numberA0 dq 2
-    numberB0 dq 1
-
-    
-message0:
-    db      '2 + 1  = ', 10 ; db is defined byte
+    message0:
+    db      '5 + 8 = ', 10 ; db is defined byte
 message_end0:
 
-    numberA1 dq 5
-    numberB1 dq 2
 
     
-message1:
-    db      '5 + 2  = ', 10 ; db is defined byte
-message_end1:
-
+    divisor db 10 ; Divisor for division by 10
+    
     remainder_array db 10 dup(0) ; Array to store remainders
     array_size equ 10
 message:
