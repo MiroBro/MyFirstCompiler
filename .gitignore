@@ -1,0 +1,7 @@
+.vs
+.dll
+.pdb
+.cache
+MyFirstCompiler/bin/
+MyFirstCompiler/obj/
+MyFirstCompiler/bin/x64/Debug/net7.0/MyFirstCompiler.dll
