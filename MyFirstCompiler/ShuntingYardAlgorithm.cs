@@ -46,7 +46,6 @@ namespace MyFirstCompiler
             for (int i = 0; i < tokenList.Count; i++)
             {
                 Token currentToken = tokenList[i];
-                //TokenType currentToken = tokenList[i].tokenType;
                 if (currentToken.tokenType == TokenType.Number)
                 {
                     outputQueue.Enqueue(tokenList[i]);
@@ -121,32 +120,3 @@ namespace MyFirstCompiler
         }
     }
 }
-
-
-
-
-
-
-
-/*
-private int GetTokenPrecedence(Token token)
-{
-switch (token)
-{
-    case Token.Add:
-        return plusPrecedence;
-    case Token.Subtract:
-        return subtractPrecedence;
-    case Token.Multiply:
-        return multiplyPrecedence;
-    case Token.Divide:
-        return dividePrecedence;
-}
-return 0;
-}*/
-
-
-//private int plusPrecedence = 5;
-//private int subtractPrecedence = 5;
-//private int multiplyPrecedence = 10;
-//private int dividePrecedence = 10;
