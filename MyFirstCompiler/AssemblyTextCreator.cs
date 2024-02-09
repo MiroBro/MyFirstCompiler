@@ -56,10 +56,33 @@ namespace MyFirstCompiler
                 lea    rdx, message ;lea = load effective adress
                 mov    r8, message_end - message
                 call PrintString
+                call ResetASCIIInt
 
                 ;mov     rcx, rax
             
+            """;        
+        
+        private const string resetASCII = $"""
+
+            ResetASCIIInt:
+            _start:
+                mov esi, message        ; Move the address of message into esi
+                mov edi, esi            ; Save the start address of message in edi
+                add edi, 10             ; Calculate the end address of message
+
+            fill_loop:
+                cmp esi, edi            ; Compare current address with end address
+                je loop_end             ; If they are equal, exit the loop
+
+                mov byte [esi], 0       ; Set the byte at the address pointed to by esi to null
+                inc esi                 ; Move to the next byte in the message
+                jmp fill_loop           ; Jump back to fill_loop
+
+            loop_end:
+                ; mov byte [esi], 0       ; Null-terminate the string   
+
             """;
+
 
 
         //This assembly works for NASM on Windows x64 bit
@@ -189,6 +212,7 @@ namespace MyFirstCompiler
 
             sb.AppendLine(assemblyStart);
             sb.AppendLine(intToASCIIFunction);
+            sb.AppendLine(resetASCII);
             sb.AppendLine(printString);
             sb.AppendLine(winMainStart);
 
