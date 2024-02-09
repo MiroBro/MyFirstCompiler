@@ -32,7 +32,10 @@ namespace MyFirstCompiler
     
             
             divisor db 10 ; Divisor for division by 10
-            
+
+            newline db 10  ; newline character (\n)
+            newline_len equ $ - newline  ; length of the newline character
+
             remainder_array db 10 dup(0) ; Array to store remainders
             array_size equ 10
         message:
@@ -56,6 +59,7 @@ namespace MyFirstCompiler
                 lea    rdx, message ;lea = load effective adress
                 mov    r8, message_end - message
                 call PrintString
+                call PrintNewLine
                 call ResetASCIIInt
 
                 ;mov     rcx, rax
@@ -83,6 +87,15 @@ namespace MyFirstCompiler
 
             """;
 
+        private const string printNewLine = $"""
+
+            PrintNewLine:
+
+                lea     rdx, [newline]   ; address of newline character
+                mov     r8, newline_len  ; length of newline character
+                call    PrintString
+
+            """;
 
 
         //This assembly works for NASM on Windows x64 bit
@@ -213,6 +226,7 @@ namespace MyFirstCompiler
             sb.AppendLine(assemblyStart);
             sb.AppendLine(intToASCIIFunction);
             sb.AppendLine(resetASCII);
+            sb.AppendLine(printNewLine);
             sb.AppendLine(printString);
             sb.AppendLine(winMainStart);
 
