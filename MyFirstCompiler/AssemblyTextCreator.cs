@@ -139,12 +139,12 @@ namespace MyFirstCompiler
                 jmp     not_negative ; if not negative dont add -
 
             is_negative:
-                mov     rbx,1 ;set rbx to 1 indicating a neg number
-                neg     rax   ;negate rax to make it positive
-                jmp    divide_loop_
+                mov     rbx, 1 ; set rbx to 1 indicating a negative number
+                neg     rax     ; negate rax to make it positive
+                jmp     divide_loop_ ; jump to divide loop to start converting to ASCII
 
             not_negative:
-                ;just continue and do nothing special
+                ; continue without adding the negative sign
 
             divide_loop_:
                 xor     rdx, rdx ; Clear remainder

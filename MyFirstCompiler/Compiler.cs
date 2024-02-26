@@ -13,8 +13,10 @@ internal class Compiler
 
     private AssemblyTextCreator assemblyTextCreator;
 
-    public void Run(string[] expressionToCompile)
+    public void Run(string[] expressionToCompile2)
     {
+        List<string> expressionToCompile = new List<string>(File.ReadAllLines("input.txt"));
+
         assemblyTextCreator = new AssemblyTextCreator();
 
         foreach (var expression in expressionToCompile)
