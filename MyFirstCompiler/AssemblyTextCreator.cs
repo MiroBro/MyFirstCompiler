@@ -134,6 +134,18 @@ namespace MyFirstCompiler
                 mov     rcx, 10 ; Divisor for division by 10
                 lea     rdi, [message + array_size - 1] ; Set destination buffer (end of buffer)
 
+                cmp     rax, 0 ; compare input number to zero
+                jl      is_negative ; if negative jump to adding -
+                jmp     not_negative ; if not negative dont add -
+
+            is_negative:
+                mov     rbx,1 ;set rbx to 1 indicating a neg number
+                neg     rax   ;negate rax to make it positive
+                jmp    divide_loop_
+
+            not_negative:
+                ;just continue and do nothing special
+
             divide_loop_:
                 xor     rdx, rdx ; Clear remainder
                 div     rcx ; Divide rax by 10
@@ -145,9 +157,13 @@ namespace MyFirstCompiler
                 test    rax, rax ; Check if quotient is zero
                 jnz     divide_loop_ ; If not, continue the loop
 
+            add_negative_sign:
+                test    rbx,rbx
+                jz      end_loop_
+
+                mov     byte[rdi], '-' ;add negative sign to beginning of buffer
 
             end_loop_:
-
                 add     rsp, 8
             	ret
 
