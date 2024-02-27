@@ -144,6 +144,7 @@ namespace MyFirstCompiler
                 jmp     divide_loop_ ; jump to divide loop to start converting to ASCII
 
             not_negative:
+                mov     rbx, 0 ; set rbx to 1 indicating a negative number
                 ; continue without adding the negative sign
 
             divide_loop_:
