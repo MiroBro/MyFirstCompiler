@@ -9,8 +9,8 @@ using System.Reflection.PortableExecutable;
 
 internal class Compiler
 {
-    private static string nameOfAssembly = "calculation";
-
+   // private Dictionary<string, int> allSymbols = new Dictionary<string, int>();
+    private static string nameOfAssembly = "run";
     private AssemblyTextCreator assemblyTextCreator;
 
     public void Run(string[] expressionToCompile2)
@@ -92,10 +92,36 @@ internal class Compiler
                              """;
                 calcToDo.AddInstrucion(calc);
             }
+            else if (token.tokenType == TokenType.Symbol)
+            {
+                stack.Push(0);
+
+                string calc = $"""
+
+                                push    {token.valueName} 
+
+                             """;
+                calcToDo.AddInstrucion(calc);
+            }
             else
             {
                 switch (token.tokenType)
                 {
+                    case TokenType.Assign:
+                        {
+                            var a = stack.Pop();
+
+                            string calc =
+                            $"""
+
+                                 pop     rcx
+                                 mov     {token.valueName}, rcx
+
+                             """;
+
+                            calcToDo.AddInstrucion(calc);
+                        }
+                        break;
                     case TokenType.Add:
                         {
                             var a = stack.Pop();

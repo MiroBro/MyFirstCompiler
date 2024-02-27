@@ -10,6 +10,7 @@ namespace MyFirstCompiler
 
     public enum Precedence
     {
+        Assign = -1,
         Plus = 0,
         Subtract = 0,
         Multiply = 1,
@@ -25,6 +26,7 @@ namespace MyFirstCompiler
         private Queue<Token> outputQueue = new Queue<Token>();
         private Token lastEnqueued;
         bool wasLastTokenOperatorOrEmpty = true;
+
 
         private bool IsLastTokenOperator()
         {
@@ -47,6 +49,10 @@ namespace MyFirstCompiler
             {
                 Token currentToken = tokenList[i];
                 if (currentToken.tokenType == TokenType.Number)
+                {
+                    outputQueue.Enqueue(tokenList[i]);
+                }
+                else if (currentToken.tokenType == TokenType.Symbol)
                 {
                     outputQueue.Enqueue(tokenList[i]);
                 }
@@ -92,7 +98,7 @@ namespace MyFirstCompiler
 
         private bool IsOperator(TokenType token)
         {
-            return token == TokenType.Add || token == TokenType.Subtract || token == TokenType.Multiply || token == TokenType.Divide || token == TokenType.Sin || token == TokenType.Cos || token == TokenType.Tan || token == TokenType.Negate;
+            return token == TokenType.Add || token == TokenType.Subtract || token == TokenType.Multiply || token == TokenType.Divide || token == TokenType.Sin || token == TokenType.Cos || token == TokenType.Tan || token == TokenType.Negate || token == TokenType.Assign;
         }
 
         private int GetTokenPrecedence(Token token)
@@ -115,6 +121,8 @@ namespace MyFirstCompiler
                     return (int)Precedence.Tan;
                 case TokenType.Negate:
                     return (int)Precedence.Negate;
+                case TokenType.Assign:
+                    return (int)Precedence.Assign;
             }
             return -1;
         }

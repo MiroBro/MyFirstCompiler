@@ -272,6 +272,7 @@ namespace MyFirstCompiler
 
                 StringBuilder sbData = new StringBuilder();
                 sbData.AppendLine(calcMessageName);
+                //ADD DICTIORNAY OF THINGS TO ADD HERE
                 sbData.Replace(countCodeWord, i.ToString());
                 sbData.Replace(calcToDo, calcToDos[i].expression);
                 sb.Replace(replaceNumbersInDataSections, sbData.ToString());

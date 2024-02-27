@@ -14,7 +14,10 @@ namespace MyFirstCompiler
         char _currentChar;
         TokenType _currentToken;
         double _number;
+        string _variable;
+
         private List<Token> _tokens = new List<Token>();
+        public static Dictionary<string, int> allSymbols = new Dictionary<string, int>();
 
         public Tokenizer(TextReader reader)
         {
@@ -58,45 +61,57 @@ namespace MyFirstCompiler
             }
 
             //Special Characters
-            switch  (_currentChar) 
+            //switch  (_currentChar) 
             {
-                case '+':
+                if (_currentChar == '+')
+                {
                     NextChar();
                     _currentToken = TokenType.Add;
-                    _tokens.Add(new Token() { tokenType = _currentToken,});
+                    _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-                case '-':
+                } else if (_currentChar == '-')
+                {
                     NextChar();
                     _currentToken = TokenType.Subtract;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-                case '*':
+                } else if (_currentChar == '*')
+                {
                     NextChar();
                     _currentToken = TokenType.Multiply;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-                case '/':
+                } else if (_currentChar == '/')
+                {
                     NextChar();
                     _currentToken = TokenType.Divide;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-                case '(':
+                } else if (_currentChar == '(')
+                {
                     NextChar();
                     _currentToken = TokenType.LeftBracket;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-                case ')':
+                } else if (_currentChar == ')')
+                {
                     NextChar();
                     _currentToken = TokenType.RightBracket;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
-
+                }
+                else if (_currentChar == '=')
+                {
+                    NextChar();
+                    _currentToken = TokenType.Assign;
+                    _tokens.Add(new Token() { tokenType = _currentToken, });
+                    return;
+                }
             }
 
             //Number
             if (char.IsDigit(_currentChar) || _currentChar == '.')
             {
-
                 //Capture decimal point
 
                 var sb = new StringBuilder();
@@ -116,6 +131,29 @@ namespace MyFirstCompiler
                 return;
             }
 
+            //If variable name
+            if (char.IsLetter(_currentChar))
+            {
+                //NextChar();
+                _currentToken = TokenType.Symbol;
+
+                var sb = new StringBuilder();
+
+                while (char.IsLetter(_currentChar))
+                {
+                    sb.Append(_currentChar);
+                    NextChar();
+                }
+
+                //Parse it
+                _variable = sb.ToString();
+                _currentToken = TokenType.Symbol;
+                _tokens.Add(new Token() { tokenType = _currentToken, valueName = _variable });
+                allSymbols.Add(_variable, 0);
+                return;
+            }
+
+            //Old, should NEVER get here
             if (char.IsLetter(_currentChar))
             {
 
@@ -151,6 +189,7 @@ namespace MyFirstCompiler
     {
         public TokenType tokenType { get; set; }
         public double value { get; set; }
+        public string? valueName { get; set; }
     }
 
     public enum TokenType
@@ -166,6 +205,8 @@ namespace MyFirstCompiler
         Divide,
         Sin,
         Cos,
-        Tan
+        Tan,
+        Symbol,
+        Assign,
     }
 }
