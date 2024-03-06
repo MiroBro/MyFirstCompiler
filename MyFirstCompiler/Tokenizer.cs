@@ -17,7 +17,7 @@ namespace MyFirstCompiler
         string _variable;
 
         private List<Token> _tokens = new List<Token>();
-        public static Dictionary<string, int> allSymbols = new Dictionary<string, int>();
+        //public static Dictionary<string, int> allSymbols = new Dictionary<string, int>();
 
         public Tokenizer(TextReader reader)
         {
@@ -149,7 +149,7 @@ namespace MyFirstCompiler
                 _variable = sb.ToString();
                 _currentToken = TokenType.Symbol;
                 _tokens.Add(new Token() { tokenType = _currentToken, valueName = _variable });
-                allSymbols.Add(_variable, 0);
+                //allSymbols.Add(_variable, 0);
                 return;
             }
 

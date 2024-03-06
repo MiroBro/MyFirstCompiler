@@ -12,6 +12,7 @@ internal class Compiler
    // private Dictionary<string, int> allSymbols = new Dictionary<string, int>();
     private static string nameOfAssembly = "run";
     private AssemblyTextCreator assemblyTextCreator;
+    public static HashSet<string> allIntVariableNames = new HashSet<string>();
 
     public void Run(string[] expressionToCompile2)
     {
@@ -69,18 +70,32 @@ internal class Compiler
         Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
         List<Token> tokensInOrder = tokenizer.Tokenize();
 
+        AssignmentPair assignmentPair = SplitIntoLHSandRHS(tokensInOrder);
+
         ShuntingYardAlgorithm sya = new ShuntingYardAlgorithm();
-        Queue<Token> outputQueue = sya.GetOutputQueue(tokensInOrder);
+        assignmentPair.rhsPostSYA = sya.GetOutputQueue(assignmentPair.rhsPreSYA);
 
-        AssignmentPair assignmentPair = SplitIntoLHSandRHS(outputQueue);
-
-       CalculateOutputQueue(assignmentPair, desiredCalculation);
+        CalculateOutputQueue(assignmentPair, desiredCalculation);
+        PerformAssigmentIfProper(assignmentPair, desiredCalculation);
     }
 
-    private AssignmentPair SplitIntoLHSandRHS(Queue<Token> outputQueue)
+    private void PerformAssigmentIfProper(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
+    {
+        if (assignmentPair.lhs.Count > 0)
+        {
+            string calc =   $"""
+
+                                 mov     [{assignmentPair.lhs[0].valueName}], rax ; TRYING TO ASSIGN
+
+                             """;
+            calcToDo.AddInstrucion(calc);
+        }
+    }
+
+    private AssignmentPair SplitIntoLHSandRHS(List<Token> outputQueue)
     {
         AssignmentPair assignmentPair = new AssignmentPair();
-        
+
         bool encounteredAssignment = false;
 
         foreach (Token token in outputQueue)
@@ -91,12 +106,25 @@ internal class Compiler
             }
             else if (encounteredAssignment)
             {
-                assignmentPair.lhs.Add(token);
+                assignmentPair.rhsPreSYA.Add(token);
             }
             else
             {
-                assignmentPair.rhs.Add(token);
+                assignmentPair.lhs.Add(token);
             }
+        }
+
+        //save variable if first time encountered
+        if (encounteredAssignment && !allIntVariableNames.Contains(assignmentPair.lhs[0].valueName))
+        {
+            allIntVariableNames.Add(assignmentPair.lhs[0].valueName);
+        } 
+
+        //fix the expression if it wasnt an assignment
+        if (assignmentPair.rhsPreSYA.Count == 0)
+        {
+            assignmentPair.rhsPreSYA = assignmentPair.lhs;
+            assignmentPair.lhs = new List<Token>();
         }
 
         return assignmentPair;
@@ -105,12 +133,13 @@ internal class Compiler
     public class AssignmentPair
     {
         public List<Token> lhs = new List<Token>();
-        public List<Token> rhs = new List<Token>();
+        public List<Token> rhsPreSYA = new List<Token>();
+        public Queue<Token> rhsPostSYA = new Queue<Token>();
     }
 
     private void CalculateOutputQueue(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
     {
-        foreach (var token in assignmentPair.rhs)
+        foreach (var token in assignmentPair.rhsPostSYA)
         {
             if (token.tokenType == TokenType.Number)
             {
@@ -125,7 +154,8 @@ internal class Compiler
             {
                 string calc = $"""
 
-                                push    {token.valueName} 
+                                mov rax,[{token.valueName}] 
+                                push    rax 
 
                              """;
                 calcToDo.AddInstrucion(calc);
@@ -134,7 +164,7 @@ internal class Compiler
             {
                 switch (token.tokenType)
                 {
-                    case TokenType.Assignment:
+                    /*case TokenType.Assignment:
                         {
                             string calc =
                             $"""
@@ -147,6 +177,7 @@ internal class Compiler
                             calcToDo.AddInstrucion(calc);
                         }
                         break;
+                    */
                     case TokenType.Add:
                         {
                             string calc =

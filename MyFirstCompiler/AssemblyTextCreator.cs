@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,18 @@ namespace MyFirstCompiler
 
         private const string replaceNumbersInDataSections = "{REPLACE_DATA_NUMBERS_HERE}";
 
+        private const string variableCodeWord = "{REPLACE_WITH_VARIABLE_NAME}";
+
         private const string calcMessageName = $"""
             message{countCodeWord}:
                 db      '{calcToDo} = ', 10 ; db is defined byte
             message_end{countCodeWord}:
             """;
+
+        private const string variableNameData = $"""
+            {variableCodeWord}: dq 0
+            """;
+
 
         private const string calcData = $"""
             {replaceNumbersInDataSections}
@@ -172,7 +180,6 @@ namespace MyFirstCompiler
 
         private const string printString = """
 
-           ;TODO: Add adress and length passed in (as in I put htem in THESE registers) - MAKE SURE SFTER EXPRESSION CALCULATOR PUTS IN RCX move it to the right register
            ;Assumes the adress of the message being printed is stored in rdx, and assumes the length of the message is stored in r8 
            PrintString:
                sub     rsp, 8
@@ -276,6 +283,12 @@ namespace MyFirstCompiler
                 sbData.Replace(countCodeWord, i.ToString());
                 sbData.Replace(calcToDo, calcToDos[i].expression);
                 sb.Replace(replaceNumbersInDataSections, sbData.ToString());
+            }
+
+            foreach (var varName in Compiler.allIntVariableNames)
+            {
+                sb.AppendLine(variableNameData);
+                sb.Replace(variableCodeWord, varName);
             }
 
             sb.AppendLine(standardData);

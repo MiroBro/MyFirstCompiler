@@ -18,7 +18,7 @@ namespace MyFirstCompiler
         Cos = 2,
         Tan = 2,
         Negate = 3,
-        Assign = 4,
+        Assign = -1,
     }
     internal class ShuntingYardAlgorithm
     {
@@ -51,10 +51,10 @@ namespace MyFirstCompiler
                 {
                     outputQueue.Enqueue(tokenList[i]);
                 }
-                //else if (currentToken.tokenType == TokenType.Symbol)
-                //{
-                //    outputQueue.Enqueue(tokenList[i]);
-                //}
+                else if (currentToken.tokenType == TokenType.Symbol)
+                {
+                    outputQueue.Enqueue(tokenList[i]);
+                }
                 else if (IsOperator(currentToken.tokenType))
                 {
                     if (WasLastTokenOperatorOrEmpty() && (lastEnqueued == null || lastEnqueued.tokenType != TokenType.Number)) 
