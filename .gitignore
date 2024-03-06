@@ -5,7 +5,6 @@
 *.asm
 *.exe
 *.obj
-*.vsidx
-*.suo
 /MyFirstCompiler/bin/*
 /MyFirstCompiler/obj/*
+/.vs/*
