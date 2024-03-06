@@ -103,7 +103,7 @@ namespace MyFirstCompiler
                 else if (_currentChar == '=')
                 {
                     NextChar();
-                    _currentToken = TokenType.Assign;
+                    _currentToken = TokenType.Assignment;
                     _tokens.Add(new Token() { tokenType = _currentToken, });
                     return;
                 }
@@ -207,6 +207,6 @@ namespace MyFirstCompiler
         Cos,
         Tan,
         Symbol,
-        Assign,
+        Assignment,
     }
 }

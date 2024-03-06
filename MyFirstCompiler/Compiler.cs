@@ -64,7 +64,7 @@ internal class Compiler
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    private double EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
+    private void EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
     {
         Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
         List<Token> tokensInOrder = tokenizer.Tokenize();
@@ -72,19 +72,48 @@ internal class Compiler
         ShuntingYardAlgorithm sya = new ShuntingYardAlgorithm();
         Queue<Token> outputQueue = sya.GetOutputQueue(tokensInOrder);
 
-        return CalculateOutputQueue(outputQueue, desiredCalculation);
+        AssignmentPair assignmentPair = SplitIntoLHSandRHS(outputQueue);
+
+       CalculateOutputQueue(assignmentPair, desiredCalculation);
     }
 
-    private double CalculateOutputQueue(Queue<Token> outputQueue, AssemblyTextCreator.DesiredCalc calcToDo)
+    private AssignmentPair SplitIntoLHSandRHS(Queue<Token> outputQueue)
     {
-        Stack<double> stack = new Stack<double>();
+        AssignmentPair assignmentPair = new AssignmentPair();
+        
+        bool encounteredAssignment = false;
 
-        foreach (var token in outputQueue)
+        foreach (Token token in outputQueue)
+        {
+            if (token.tokenType == TokenType.Assignment)
+            {
+                encounteredAssignment = true;
+            }
+            else if (encounteredAssignment)
+            {
+                assignmentPair.lhs.Add(token);
+            }
+            else
+            {
+                assignmentPair.rhs.Add(token);
+            }
+        }
+
+        return assignmentPair;
+    }
+
+    public class AssignmentPair
+    {
+        public List<Token> lhs = new List<Token>();
+        public List<Token> rhs = new List<Token>();
+    }
+
+    private void CalculateOutputQueue(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
+    {
+        foreach (var token in assignmentPair.rhs)
         {
             if (token.tokenType == TokenType.Number)
             {
-                stack.Push(token.value);
-
                 string calc = $"""
 
                                 push    {(int)token.value} 
@@ -94,8 +123,6 @@ internal class Compiler
             }
             else if (token.tokenType == TokenType.Symbol)
             {
-                stack.Push(0);
-
                 string calc = $"""
 
                                 push    {token.valueName} 
@@ -107,10 +134,8 @@ internal class Compiler
             {
                 switch (token.tokenType)
                 {
-                    case TokenType.Assign:
+                    case TokenType.Assignment:
                         {
-                            var a = stack.Pop();
-
                             string calc =
                             $"""
 
@@ -124,11 +149,6 @@ internal class Compiler
                         break;
                     case TokenType.Add:
                         {
-                            var a = stack.Pop();
-                            var b = stack.Pop();
-                            var r = a + b;
-                            stack.Push(r);
-
                             string calc =
                             $"""
 
@@ -144,10 +164,6 @@ internal class Compiler
                         break;
                     case TokenType.Subtract:
                         {
-                            var a = stack.Pop();
-                            var b = stack.Pop();
-                            var r = b - a;
-
                             string calc =
                             $"""
 
@@ -159,15 +175,10 @@ internal class Compiler
                              """;
 
                             calcToDo.AddInstrucion(calc);
-
-                            stack.Push(r);
                         }
                         break;
                     case TokenType.Negate:
                         {
-                            var a = stack.Pop();
-                            var r = -a;
-                            stack.Push(r);
                             string calc = // Cheating because I couldn't figure out how to multiply by -1 hahahah
                             $"""
 
@@ -182,10 +193,6 @@ internal class Compiler
                         break;
                     case TokenType.Divide:
                         {
-                            var a = stack.Pop();
-                            var b = stack.Pop();
-                            var r = a / b;
-                            stack.Push(r);
                             string calc =
                             $"""
 
@@ -201,10 +208,6 @@ internal class Compiler
                         break;
                     case TokenType.Multiply:
                         {
-                            var a = stack.Pop();
-                            var b = stack.Pop();
-                            var r = a * b;
-                            stack.Push(r);
                             string calc =
                             $"""
 
@@ -219,23 +222,14 @@ internal class Compiler
                         break;
                     case TokenType.Sin:
                         {
-                            var a = stack.Pop();
-                            var r = Math.Sin((a * Math.PI) / 180);
-                            stack.Push(r);
                         }
                         break;
                     case TokenType.Cos:
                         {
-                            var a = stack.Pop();
-                            var r = Math.Cos((a * Math.PI) / 180);
-                            stack.Push(r);
                         }
                         break;
                     case TokenType.Tan:
                         {
-                            var a = stack.Pop();
-                            var r = Math.Tan((a * Math.PI) / 180);
-                            stack.Push(r);
                         }
                         break;
                 }
@@ -247,6 +241,5 @@ internal class Compiler
                 mov     rax, rcx
             """;
         calcToDo.AddInstrucion(finalCalc);
-        return stack.Pop();
     }
 }

@@ -10,7 +10,6 @@ namespace MyFirstCompiler
 
     public enum Precedence
     {
-        Assign = -1,
         Plus = 0,
         Subtract = 0,
         Multiply = 1,
@@ -19,7 +18,7 @@ namespace MyFirstCompiler
         Cos = 2,
         Tan = 2,
         Negate = 3,
-
+        Assign = 4,
     }
     internal class ShuntingYardAlgorithm
     {
@@ -52,10 +51,10 @@ namespace MyFirstCompiler
                 {
                     outputQueue.Enqueue(tokenList[i]);
                 }
-                else if (currentToken.tokenType == TokenType.Symbol)
-                {
-                    outputQueue.Enqueue(tokenList[i]);
-                }
+                //else if (currentToken.tokenType == TokenType.Symbol)
+                //{
+                //    outputQueue.Enqueue(tokenList[i]);
+                //}
                 else if (IsOperator(currentToken.tokenType))
                 {
                     if (WasLastTokenOperatorOrEmpty() && (lastEnqueued == null || lastEnqueued.tokenType != TokenType.Number)) 
@@ -98,7 +97,7 @@ namespace MyFirstCompiler
 
         private bool IsOperator(TokenType token)
         {
-            return token == TokenType.Add || token == TokenType.Subtract || token == TokenType.Multiply || token == TokenType.Divide || token == TokenType.Sin || token == TokenType.Cos || token == TokenType.Tan || token == TokenType.Negate || token == TokenType.Assign;
+            return token == TokenType.Add || token == TokenType.Subtract || token == TokenType.Multiply || token == TokenType.Divide || token == TokenType.Sin || token == TokenType.Cos || token == TokenType.Tan || token == TokenType.Negate || token == TokenType.Assignment;
         }
 
         private int GetTokenPrecedence(Token token)
@@ -121,7 +120,7 @@ namespace MyFirstCompiler
                     return (int)Precedence.Tan;
                 case TokenType.Negate:
                     return (int)Precedence.Negate;
-                case TokenType.Assign:
+                case TokenType.Assignment:
                     return (int)Precedence.Assign;
             }
             return -1;
