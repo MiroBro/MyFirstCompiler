@@ -19,7 +19,7 @@ namespace MyFirstCompiler
 
         private const string calcMessageName = $"""
             message{countCodeWord}:
-                db      '{calcToDo} = ', 10 ; db is defined byte
+                db      '{calcToDo}:', 10 ; db is defined byte
             message_end{countCodeWord}:
             """;
 
