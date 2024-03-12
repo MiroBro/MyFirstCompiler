@@ -16,6 +16,7 @@ internal class Compiler
 
     public void Run(string[] expressionToCompile2)
     {
+        Parser parser = new Parser();
         List<string> expressionToCompile = new List<string>(File.ReadAllLines("input.txt"));
 
         assemblyTextCreator = new AssemblyTextCreator();
@@ -23,7 +24,7 @@ internal class Compiler
         foreach (var expression in expressionToCompile)
         {
             AssemblyTextCreator.DesiredCalc desiredCalculation = new AssemblyTextCreator.DesiredCalc() {expression = expression};
-            EvaluateExpression(desiredCalculation);
+            EvaluateExpression(desiredCalculation, parser);
             assemblyTextCreator.AddDesiredCalculation(desiredCalculation);
         }
 
@@ -35,12 +36,13 @@ internal class Compiler
 
         CreateExecutable();
     }
-    private void EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
+    private void EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation, Parser parser)//string expression)
     {
         Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
         List<Token> tokensInOrder = tokenizer.Tokenize();
 
-        AssignmentPair assignmentPair = SplitIntoLHSandRHS(tokensInOrder);
+        AssignmentPair assignmentPair = parser.Parse(tokensInOrder);
+
 
         //check if the pair is a function delcaration? In that case.... do something strange I don't know D:
         //maybe like make a lfh shunting yard function algorithm??? (that checks if name is not a saved variable, so its a function .... and something)
@@ -92,51 +94,6 @@ internal class Compiler
                              """;
             calcToDo.AddInstrucion(calc);
         }
-    }
-
-    private AssignmentPair SplitIntoLHSandRHS(List<Token> outputQueue)
-    {
-        AssignmentPair assignmentPair = new AssignmentPair();
-
-        bool encounteredAssignment = false;
-
-        foreach (Token token in outputQueue)
-        {
-            if (token.tokenType == TokenType.Assignment)
-            {
-                encounteredAssignment = true;
-            }
-            else if (encounteredAssignment)
-            {
-                assignmentPair.rhsPreSYA.Add(token);
-            }
-            else
-            {
-                assignmentPair.lhs.Add(token);
-            }
-        }
-
-        //save variable if first time encountered
-        if (encounteredAssignment && !allIntVariableNames.Contains(assignmentPair.lhs[0].valueName))
-        {
-            allIntVariableNames.Add(assignmentPair.lhs[0].valueName);
-        } 
-
-        //fix the expression if it wasnt an assignment
-        if (assignmentPair.rhsPreSYA.Count == 0)
-        {
-            assignmentPair.rhsPreSYA = assignmentPair.lhs;
-            assignmentPair.lhs = new List<Token>();
-        }
-
-        return assignmentPair;
-    }
-
-    public class AssignmentPair
-    {
-        public List<Token> lhs = new List<Token>();
-        public List<Token> rhsPreSYA = new List<Token>();
-        public Queue<Token> rhsPostSYA = new Queue<Token>();
     }
 
     private void CalculateOutputQueue(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)

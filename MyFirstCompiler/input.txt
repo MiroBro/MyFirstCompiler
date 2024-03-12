@@ -1,5 +1,7 @@
-hehe = 9
-10 * (hehe + 1)
+baba(is) = is + 10
+you = 9
+10 * (you + 1)
+baba(you)
 4 - 2888
 hehe + 58
 50 - 800
