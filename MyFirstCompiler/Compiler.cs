@@ -35,6 +35,22 @@ internal class Compiler
 
         CreateExecutable();
     }
+    private void EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
+    {
+        Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
+        List<Token> tokensInOrder = tokenizer.Tokenize();
+
+        AssignmentPair assignmentPair = SplitIntoLHSandRHS(tokensInOrder);
+
+        //check if the pair is a function delcaration? In that case.... do something strange I don't know D:
+        //maybe like make a lfh shunting yard function algorithm??? (that checks if name is not a saved variable, so its a function .... and something)
+
+        ShuntingYardAlgorithm sya = new ShuntingYardAlgorithm();
+        assignmentPair.rhsPostSYA = sya.GetOutputQueue(assignmentPair.rhsPreSYA);
+
+        CalculateOutputQueue(assignmentPair, desiredCalculation);
+        PerformAssigmentIfProper(assignmentPair, desiredCalculation);
+    }
 
     private static void CreateExecutable()
     {
@@ -63,20 +79,6 @@ internal class Compiler
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Finished assembling {outputAssembling} and linking {outputLinking}.");
         Console.ForegroundColor = ConsoleColor.White;
-    }
-
-    private void EvaluateExpression(AssemblyTextCreator.DesiredCalc desiredCalculation)//string expression)
-    {
-        Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
-        List<Token> tokensInOrder = tokenizer.Tokenize();
-
-        AssignmentPair assignmentPair = SplitIntoLHSandRHS(tokensInOrder);
-
-        ShuntingYardAlgorithm sya = new ShuntingYardAlgorithm();
-        assignmentPair.rhsPostSYA = sya.GetOutputQueue(assignmentPair.rhsPreSYA);
-
-        CalculateOutputQueue(assignmentPair, desiredCalculation);
-        PerformAssigmentIfProper(assignmentPair, desiredCalculation);
     }
 
     private void PerformAssigmentIfProper(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)

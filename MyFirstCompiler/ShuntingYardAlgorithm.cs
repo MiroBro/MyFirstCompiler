@@ -57,7 +57,7 @@ namespace MyFirstCompiler
                 }
                 else if (IsOperator(currentToken.tokenType))
                 {
-                    if (WasLastTokenOperatorOrEmpty() && (lastEnqueued == null || lastEnqueued.tokenType != TokenType.Number)) 
+                    if (WasLastTokenOperatorOrEmpty() && (lastEnqueued == null || (lastEnqueued.tokenType != TokenType.Number || lastEnqueued.tokenType != TokenType.Symbol))) 
                     {
                         if (currentToken.tokenType == TokenType.Subtract)
                         {
