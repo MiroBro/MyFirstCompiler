@@ -184,13 +184,6 @@ namespace MyFirstCompiler
             throw new InvalidDataException($"Unexpected character : {_currentChar}");
         }
     }
-    
-    public class Token
-    {
-        public TokenType tokenType { get; set; }
-        public double value { get; set; }
-        public string? valueName { get; set; }
-    }
 
     public enum TokenType
     {

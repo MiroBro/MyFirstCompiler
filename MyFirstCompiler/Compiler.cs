@@ -13,6 +13,7 @@ internal class Compiler
     private static string nameOfAssembly = "run";
     private AssemblyTextCreator assemblyTextCreator;
     public static HashSet<string> allIntVariableNames = new HashSet<string>();
+    public static HashSet<string> allFunctionNames = new HashSet<string>();
 
     public void Run(string[] expressionToCompile2)
     {
@@ -41,7 +42,7 @@ internal class Compiler
         Tokenizer tokenizer = new Tokenizer(new StringReader(desiredCalculation.expression));
         List<Token> tokensInOrder = tokenizer.Tokenize();
 
-        AssignmentPair assignmentPair = parser.Parse(tokensInOrder);
+        Statement assignmentPair = parser.Parse(tokensInOrder);
 
 
         //check if the pair is a function delcaration? In that case.... do something strange I don't know D:
@@ -83,7 +84,7 @@ internal class Compiler
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    private void PerformAssigmentIfProper(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
+    private void PerformAssigmentIfProper(Statement assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
     {
         if (assignmentPair.lhs.Count > 0)
         {
@@ -96,7 +97,7 @@ internal class Compiler
         }
     }
 
-    private void CalculateOutputQueue(AssignmentPair assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
+    private void CalculateOutputQueue(Statement assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
     {
         foreach (var token in assignmentPair.rhsPostSYA)
         {
