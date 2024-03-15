@@ -1,8 +1,7 @@
-baba(is) = is + 10
+baba(is) = 2 + 10
 you = 9
+baba(1)
 10 * (you + 1)
-baba(you)
 4 - 2888
-hehe + 58
 50 - 800
 3 - 10

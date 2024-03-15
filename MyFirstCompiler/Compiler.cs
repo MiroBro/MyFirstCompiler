@@ -86,14 +86,36 @@ internal class Compiler
 
     private void PerformAssigmentIfProper(Statement assignmentPair, AssemblyTextCreator.DesiredCalc calcToDo)
     {
-        if (assignmentPair.lhs.Count > 0)
+        if (assignmentPair.statementType == MyFirstCompiler.StatementType.Assignment)//assignmentPair.lhs.Count > 0)
         {
             string calc =   $"""
 
                                  mov     [{assignmentPair.lhs[0].valueName}], rax ; TRYING TO ASSIGN
 
                              """;
-            calcToDo.AddInstrucion(calc);
+            calcToDo.AddInstrucionToEnd(calc);
+        } else if (assignmentPair.statementType == MyFirstCompiler.StatementType.FunctionDef)
+        {
+            string calcBeg = $"""
+
+                             {assignmentPair.lhs[0].valueName}1: ; Defining method? what the heck am I doing lol
+
+                             """;
+            string calcEnd = $"""
+
+                             ; ret ; Returning to where you came from?
+
+                             """;
+            calcToDo.AddInstructionToBeginning(calcBeg);
+            calcToDo.AddInstrucionToEnd(calcEnd);
+        } else if (assignmentPair.statementType == MyFirstCompiler.StatementType.FunctionCall)
+        {
+            string calc = $"""
+
+                             call  {assignmentPair.rhsPostSYA.ToArray()[0].valueName}1; uuuh calling the method
+
+                             """;
+            calcToDo.AddInstructionToBeginning(calc);
         }
     }
 
@@ -108,7 +130,7 @@ internal class Compiler
                                 push    {(int)token.value} 
 
                              """;
-                calcToDo.AddInstrucion(calc);
+                calcToDo.AddInstrucionToEnd(calc);
             }
             else if (token.tokenType == TokenType.Symbol)
             {
@@ -118,7 +140,7 @@ internal class Compiler
                                 push    rax 
 
                              """;
-                calcToDo.AddInstrucion(calc);
+                calcToDo.AddInstrucionToEnd(calc);
             }
             else
             {
@@ -150,7 +172,7 @@ internal class Compiler
 
                              """;
 
-                            calcToDo.AddInstrucion(calc);
+                            calcToDo.AddInstrucionToEnd(calc);
                         }
                         break;
                     case TokenType.Subtract:
@@ -165,7 +187,7 @@ internal class Compiler
 
                              """;
 
-                            calcToDo.AddInstrucion(calc);
+                            calcToDo.AddInstrucionToEnd(calc);
                         }
                         break;
                     case TokenType.Negate:
@@ -179,7 +201,7 @@ internal class Compiler
                                  push    rcx
 
                              """;
-                            calcToDo.AddInstrucion(calc);
+                            calcToDo.AddInstrucionToEnd(calc);
                         }
                         break;
                     case TokenType.Divide:
@@ -194,7 +216,7 @@ internal class Compiler
                                  push    rax
 
                              """;
-                            calcToDo.AddInstrucion(calc);
+                            calcToDo.AddInstrucionToEnd(calc);
                         }
                         break;
                     case TokenType.Multiply:
@@ -208,7 +230,7 @@ internal class Compiler
                                  push    rax
 
                              """;
-                            calcToDo.AddInstrucion(calc);
+                            calcToDo.AddInstrucionToEnd(calc);
                         }
                         break;
                     case TokenType.Sin:
@@ -231,6 +253,6 @@ internal class Compiler
                 pop     rcx
                 mov     rax, rcx
             """;
-        calcToDo.AddInstrucion(finalCalc);
+        calcToDo.AddInstrucionToEnd(finalCalc);
     }
 }

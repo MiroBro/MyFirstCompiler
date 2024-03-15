@@ -219,9 +219,19 @@ namespace MyFirstCompiler
             public string expression = "";
             public List<string> allInstructions = new List<string>();
 
-            public void AddInstrucion(string instrucion) 
+            public void AddInstrucionToEnd(string instrucion) 
             {
                 allInstructions.Add(instrucion);
+            }
+
+            public void AddInstructionToBeginning(string instrucion)
+            {
+                allInstructions.Insert(0, instrucion);
+            }
+
+            public void SetAsInstruction(string instrucion)
+            {
+                allInstructions = new List<string>() { instrucion};
             }
         }
 
